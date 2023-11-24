@@ -1,0 +1,8 @@
+online_2096/sipanda/twa/DelegationService.java
+ online_2096.sipanda.twa.DelegationService
+online_2096/sipanda/twa/LauncherActivity.java
+ online_2096.sipanda.twa.LauncherActivity
+online_2096/sipanda/twa/Application.java
+ online_2096.sipanda.twa.Application
+online_2096/sipanda/twa/BuildConfig.java
+ online_2096.sipanda.twa.BuildConfig
