@@ -2,9 +2,9 @@ import './App.css';
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faChalkboard,faComputer,faChevronDown,faChevronUp,faBook,faList,faPlus,faPaperPlane,faClockRotateLeft,faHandHolding,faRotateLeft, faThumbsUp, faThumbsDown,  faUsersGear, faEnvelope, faUserShield} from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faChalkboard,faComputer,faChevronDown,faAnglesLeft, faUserGear,faBook,faList,faPlus,faPaperPlane,faClockRotateLeft,faHandHolding,faRotateLeft, faThumbsUp, faThumbsDown,  faUsersGear, faEnvelope, faUserShield} from '@fortawesome/free-solid-svg-icons';
 import { faComments, faFileLines } from '@fortawesome/free-regular-svg-icons';
-import lmd from './resources/img/logo.png';
+import lmd from './resources/img/logo.png'
 import profile from './resources/profile/p14.png';
 import Dashboard from './pages/Dashboard';
 import Chat from './pages/Chat';
@@ -20,30 +20,73 @@ import Notfound from './pages/Notfound';
 import MyReport from './pages/MyReport';
 import Test from './pages/Test';
 import Qrgen from './pages/Qrgen';
+import Offline from './pages/Offline';
 import { AuthProvider, useAuth } from './AuthContext';
 import { Bounce,  ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import {
+  Card,
+  Typography,
+  List,
+  ListItem,
+  ListItemPrefix,
+  ListItemSuffix,
+  Chip,
+  Accordion,
+  AccordionHeader,
+  AccordionBody,
+  Drawer,
+} from "@material-tailwind/react";
 
 
 const Home = () =>  {
   const { loggedIn, logout, username, Role, Roles, email, Notification, setNotification, setNotificationStatus, NotificationStatus, NotificationInfo, setNotificationInfo } = useAuth();
+  const [openSidebar, setOpenSidebar] = useState(true);
+  const [openDrawer, setOpenDrawer] = useState(true);
+  const [openSubmenu, setOpenSubmenu] = useState(0);
+  const [isDesktopView, setIsDesktopView] = useState(window.innerWidth > 768);
+  const [rotateButton, setRotateButton] = useState(false);
 
-  // Declare Variable
-  const [activeMenu, setActiveMenu] = useState(null);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const handleOpenSidebar = () => {
+    setOpenSidebar((prev) => !prev);
+    setRotateButton(!rotateButton);
+  };
+ 
+  const handleOpenDrawer = () => {
+    setOpenDrawer((prev) => !prev);
+    setRotateButton(!rotateButton);
+  };
 
-  const toggleMenu = (menu) => {
-    if (activeMenu === menu) {
-      setActiveMenu(null);
+  const handleOpenSubmenu = (value) => {
+    setOpenSubmenu(openSubmenu === value ? 0 : value);
+  };
+
+  const handleResizeHehe = () => {
+      setIsDesktopView(window.innerWidth > 768);
+  }; 
+  
+  const handleResizeApp = () => {
+    if (window.innerWidth <= 768) {
+      setOpenSidebar(false);
     } else {
-      setActiveMenu(menu);
+      setOpenSidebar(true);
     }
   };
+  
+  useEffect(() => {
+      window.addEventListener('resize', handleResizeHehe);
 
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
+      return () => {
+      window.removeEventListener('resize', handleResizeHehe);
+      };
+  }, []);
 
+  useEffect(() => {
+    window.addEventListener('resize', handleResizeApp);
+    return () => {
+      window.removeEventListener('resize', handleResizeApp);
+    };
+  }, []);
 
   const notify = () => {
     toast.success("Wow so easy !", {
@@ -76,48 +119,12 @@ const Home = () =>  {
     setShowPopoverProfile(!showPopoverProfile);
   };
 
-  const sidebarStyles = {
-    left: isSidebarOpen ? '0' : '-296px',
-    transition: 'left 0.5s ease-in-out',
-  };
-
-  const mainContentStyles = {
-    marginLeft: isSidebarOpen ? '296px' : '0',
-    width: isSidebarOpen ? 'calc(100% - 296px)' : '100%',
-    transition: 'margin 0.5s ease-in-out, width 0.5s ease-in-out',
-  };
-
-  const toggleIconStyles = {
-    transform: isSidebarOpen ? 'rotate(0deg)' : 'rotate(180deg)',
-    transition: 'transform 0.3s ease',
-  };
-
-  const handleResize = () => {
-    if (window.innerWidth <= 768) {
-      setIsSidebarOpen(false);
-    } else {
-      setIsSidebarOpen(true);
-    }
-  };
-
-  useEffect(() => {
-    window.addEventListener('resize', handleResize);
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
-
   return (
     <Router>
       {/* NAVBAR */}
       {loggedIn ? (
         <div className='flex fixed text-white items-center w-full justify-between z-50 bg-gray-800 h-[60px] px-7'>
           <div className='flex justify-between items-center'>
-            <div id='sidebarToggle' className={`navbar-toggle flex items-center justify-center bg-slate-600 w-[40px] h-[40px] rounded-lg cursor-pointer ease-in-out duration-300 ml-0 ${isSidebarOpen ? '' : 'sidebar-closed'}`} onClick={toggleSidebar}>
-              <button className='toggle-box'>
-                <FontAwesomeIcon icon={faArrowLeft} className='toggle-icon' style={toggleIconStyles} />
-              </button>
-            </div>
             <div className='logo pl-6'>
               <img src={lmd} alt='logohe' className='w-[150px] h-auto flex m-auto items-center' />
             </div>
@@ -220,146 +227,400 @@ const Home = () =>  {
       {/* CONTAINER */}
       {loggedIn ? (
       <div className='flex'>
-        {/* SIDEBAR */}
-        <div className={`sidebar text-white fixed z-50 bg-gray-800 w-[296px] h-screen mt-[61px] ${isSidebarOpen ? 'sidebar-opened' : 'sidebar-closed'}`} id='sidebar' style={sidebarStyles}>
-          <div className='flex mt-5 justify-center mb-5'>
-            <div className='flex text-center font-bold uppercase text-2xl mt-4 tracking-wider'>Asset<br />Management</div>
-          </div>
-          <div className='mt-14 p-4'>
-            <ul className='space-y-2'>
-              {/* Dashboard */}
-              <li className='menu-item'>
-                <Link to='/'>
-                  <button className='flex items-center'>
-                    <FontAwesomeIcon icon={faChalkboard} /><span className='pl-2 dashboard-menu'>Dashboard</span>
+        {isDesktopView && (
+          <Card 
+            className={`h-screen text-white z-50 fixed mt-[60px] w-full bg-gray-800 rounded-none max-w-[296px] ${openSidebar ? 'sidebar-opened' : 'sidebar-closed'}`} 
+            id='sidebar' 
+            style={{left: openSidebar ? '0' : '-296px', 
+                    transition: 'left 0.5s ease-in-out',
+                  }}
+          >
+            <div className="mb-8 p-8">
+              <Typography variant="h5" className='uppercase text-center font-semibold text-2xl' color="white">
+                asset<br />management
+              </Typography>
+                <div className="relative">
+                  <button 
+                    onClick={handleOpenSidebar} 
+                    className="absolute bottom-10 -right-14 w-10 h-8 bg-gray-800 border-[#efefef] border-2 rounded-full text-[#efefef]" 
+                  >
+                    <FontAwesomeIcon
+                      icon={faAnglesLeft} 
+                      size='xs' 
+                      style={{transform: openSidebar ? 'rotate(0deg)' : 'rotate(180deg)', 
+                              transition: 'transform 0.8s ease', 
+                            }}
+                    />
                   </button>
-                </Link>
-              </li>
-              {/* Chat */}
-              <li className='menu-item'>
-                <Link to='/chat'>
-                  <button className='flex items-center'>
-                    <FontAwesomeIcon icon={faComments} /><span className='pl-2 chat-menu'>Chat</span>
-                  </button>
-                </Link>
-              </li>
-              {/* Asset */}
-              <li className='menu-item'>
-                <button className='flex items-center justify-between px-5' onClick={() => toggleMenu('asset')}>
-                  <div>
-                    <FontAwesomeIcon icon={faComputer} />
-                    <span className='pl-2'>Assets</span>
-                  </div>
-                  <FontAwesomeIcon icon={activeMenu === 'asset' ? faChevronUp : faChevronDown} className='drop-arrow' />
-                </button>
-                {activeMenu === 'asset' && (
-                  <ul className='mt-2 ease-in-out'>
-                    <li className='submenu-item bg-gray-600'>
-                      <Link to='/listasset'>
-                        <button className='flex items-center'>
-                          <FontAwesomeIcon icon={faList} /><span className='pl-2'>List of Asset</span>
-                        </button>
-                      </Link>
-                    </li>
+                </div>
+            </div>
+            <List className='px-6'>
+              {/* DASHBOARD */}
+              <Link to='/'>
+                <ListItem className='px-4 text-white hover:bg-[#323b49] hover:text-white focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
+                  <ListItemPrefix className='mr-3 w-6 h-6'>
+                    <FontAwesomeIcon icon={faChalkboard}/>
+                  </ListItemPrefix>
+                  <Typography>
+                    Dashboard
+                  </Typography>
+                </ListItem>
+              </Link>
+              {/* CHAT */}
+              <Link to='/chat'>
+                <ListItem className='px-4 text-white hover:bg-[#323b49] hover:text-white focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
+                  <ListItemPrefix className='mr-3 w-6 h-6'>
+                    <FontAwesomeIcon icon={faComments} />
+                  </ListItemPrefix>
+                  <Typography>
+                    Chat
+                  </Typography>
+                  <ListItemSuffix>
+                    <Chip value="14" size="sm" variant="white" color="blue-gray" className="rounded-full" />
+                  </ListItemSuffix>
+                </ListItem>
+              </Link>
+              {/* ASSET */}
+              <Accordion
+                open={openSubmenu === 1}
+                icon={
+                  <FontAwesomeIcon icon={faChevronDown} size=''
+                    className={`mx-auto items-center flex h-3 w-4 transition-transform ${openSubmenu === 1 ? "rotate-180" : ""}`}
+                  />
+                }
+              >
+                <ListItem className="p-0 px-1 hover:bg-[#323b49] active:bg-gray-600 focus:bg-gray-800 bg-gray-800" selected={openSubmenu === 1}>
+                  <AccordionHeader onClick={() => handleOpenSubmenu(1)} className="border-b-0 p-3 bg-none text-white hover:text-white">
+                    <ListItemPrefix className='mr-3 w-6 h-6'>
+                      <FontAwesomeIcon icon={faComputer} />
+                    </ListItemPrefix>
+                    <Typography color="white" className="mr-auto font-normal">
+                      Assets
+                    </Typography>
+                  </AccordionHeader>
+                </ListItem>
+                <AccordionBody className="p-0 bg-gray-600">
+                  <List className="p-0 gap-0">
+                    <Link to='/listasset'>
+                      <ListItem className='px-4 text-white hover:bg-[#374151] hover:text-white hover:rounded-none focus:rounded-none focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
+                        <ListItemPrefix className='mr-3 w-6 h-6'>
+                          <FontAwesomeIcon icon={faList} />
+                        </ListItemPrefix>
+                        List of Asset
+                      </ListItem>
+                    </Link>
                     {Role === 2 || Role === 1 ? (
-                      <li className='submenu-item bg-gray-600'>
-                        <Link to='/addasset'>
-                          <button className='flex items-center'>
-                            <FontAwesomeIcon icon={faPlus} /><span className='pl-2'>Add an Asset</span>
-                          </button>
-                        </Link>
-                      </li>
+                      <Link to='/addasset'>
+                        <ListItem className='px-4 text-white hover:bg-[#374151] hover:text-white hover:rounded-none focus:rounded-none focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
+                          <ListItemPrefix className='mr-3 w-6 h-6'>
+                            <FontAwesomeIcon icon={faPlus} />
+                          </ListItemPrefix>
+                          Add an Asset
+                        </ListItem>
+                      </Link>
                     ) : null}
                     {loggedIn ? (
-                      <li className='submenu-item bg-gray-600'>
-                        <Link to='/lease'>
-                          <button className='flex items-center'>
-                            <FontAwesomeIcon icon={faHandHolding} /><span className='pl-2'>Lease</span>
-                          </button>
-                        </Link>
-                      </li>
+                      <Link to='/lease'>
+                        <ListItem className='px-4 text-white hover:bg-[#374151] hover:text-white hover:rounded-none focus:rounded-none focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
+                          <ListItemPrefix className='mr-3 w-6 h-6'>
+                            <FontAwesomeIcon icon={faHandHolding} />
+                          </ListItemPrefix>
+                          Lease
+                        </ListItem>
+                      </Link>
                     ) : null}
                     {loggedIn ? (
-                      <li className='submenu-item bg-gray-600'>
-                        <Link to='/return'>
-                          <button className='flex items-center'>
-                            <FontAwesomeIcon icon={faRotateLeft} /><span className='pl-2'>Return</span>
-                          </button>
-                        </Link>
-                      </li>
+                      <Link to='/return'>
+                        <ListItem className='px-4 text-white hover:bg-[#374151] hover:text-white hover:rounded-none focus:rounded-none focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
+                          <ListItemPrefix className='mr-3 w-6 h-6'>
+                            <FontAwesomeIcon icon={faRotateLeft} />
+                          </ListItemPrefix>
+                          Return
+                        </ListItem>
+                      </Link>
                     ) : null}
-                  </ul>
-                )}
-              </li>
-              {/* Report */}
-                <li className='menu-item'>
-                  <button className='flex items-center justify-between px-5' onClick={() => toggleMenu('report')}>
-                    <div>
+                    {Role === 2 || Role === 1 ? (
+                      <Link to='/submitted'>
+                        <ListItem className='px-4 text-white hover:bg-[#374151] hover:text-white hover:rounded-none focus:rounded-none focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
+                          <ListItemPrefix className='mr-3 w-6 h-6'>
+                            <FontAwesomeIcon icon={faPaperPlane} />
+                          </ListItemPrefix>
+                          Submitted
+                        </ListItem>
+                      </Link>
+                    ) : null}
+                  </List>
+                </AccordionBody>
+              </Accordion>
+              {/* REPORT */}
+              <Accordion
+                open={openSubmenu === 2}
+                icon={
+                  <FontAwesomeIcon icon={faChevronDown} size=''
+                    className={`mx-auto items-center flex h-3 w-4 transition-transform ${openSubmenu === 1 ? "rotate-180" : ""}`}
+                  />
+                }
+              >
+                <ListItem className="p-0 px-1 hover:bg-[#323b49] active:bg-gray-600 focus:bg-gray-800 bg-gray-800" selected={openSubmenu === 2}>
+                  <AccordionHeader onClick={() => handleOpenSubmenu(2)} className="border-b-0 p-3 bg-none text-white hover:text-white">
+                    <ListItemPrefix className='mr-3 w-6 h-6'>
                       <FontAwesomeIcon icon={faBook} />
-                      <span className='pl-2'>Reports</span>
-                    </div>
-                    <FontAwesomeIcon icon={activeMenu === 'report' ? faChevronUp : faChevronDown} className='drop-arrow' />
-                  </button>
-                  {activeMenu === 'report' && (
-                    <ul className='mt-2'>
-                      {Role === 2 || Role === 1 ? (
-                        <li className='submenu-item bg-gray-600'>
-                          <Link to='/submitted'>
-                            <button className='flex items-center'>
-                              <FontAwesomeIcon icon={faPaperPlane} /><span className='pl-2'>Submitted</span>
-                            </button>
-                          </Link>
-                        </li>
-                      ) : null}
-                      {Role === 2 || Role === 1 ? (
-                        <li className='submenu-item bg-gray-600'>
-                          <Link to='/history'>
-                            <button className='flex items-center'>
-                              <FontAwesomeIcon icon={faClockRotateLeft} /><span className='pl-2'>History</span>
-                            </button>
-                          </Link>
-                        </li>
-                      ) : null}
-                      <li className='submenu-item bg-gray-600'>
-                        <Link to='/myreport'>
-                          <button className='flex items-center'>
-                            <FontAwesomeIcon icon={faFileLines} /><span className='pl-2'>My Report</span>
-                          </button>
-                        </Link>
-                      </li>
-                    </ul>
-                  )}
-                </li>
-              
-              {/* Manage User */}
-              {Role === 2 &&(
-                <li className='menu-item'>
-                  <Link to='/manageuser'>
-                    <button className='flex items-center'>
-                      <FontAwesomeIcon icon={faUsersGear} />
-                      <span className='pl-2 chat-menu'>Manage User</span>
-                    </button>
-                  </Link>
-                </li>
+                    </ListItemPrefix>
+                    <Typography color="white" className="mr-auto font-normal">
+                      Reports
+                    </Typography>
+                  </AccordionHeader>
+                </ListItem>
+                <AccordionBody className="p-0 bg-gray-600">
+                  <List className="p-0 gap-0">
+                    {Role === 2 || Role === 1 ? (
+                      <Link to='/history'>
+                        <ListItem className='px-4 text-white hover:bg-[#374151] hover:text-white hover:rounded-none focus:rounded-none focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
+                          <ListItemPrefix className='mr-3 w-6 h-6'>
+                            <FontAwesomeIcon icon={faClockRotateLeft}/>
+                          </ListItemPrefix>
+                          History
+                        </ListItem>
+                      </Link>
+                    ) : null}
+                    <Link to='myreport'>
+                      <ListItem className='px-4 text-white hover:bg-[#374151] hover:text-white hover:rounded-none focus:rounded-none focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
+                        <ListItemPrefix className='mr-3 w-6 h-6'>
+                          <FontAwesomeIcon icon={faFileLines} />
+                        </ListItemPrefix>
+                        My Report
+                      </ListItem>
+                    </Link>
+                  </List>
+                </AccordionBody>
+              </Accordion>
+              {/* MANAGE USER */}
+              {Role === 2 && (
+                <Link to='manageuser'>
+                  <ListItem className='px-4 text-white hover:bg-[#323b49] hover:text-white focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
+                    <ListItemPrefix className='mr-3 w-6 h-6'>
+                      <FontAwesomeIcon icon={faUserGear}/>
+                    </ListItemPrefix>
+                    <Typography>
+                      Manage User
+                    </Typography>
+                  </ListItem>
+                </Link>
               )}
-            </ul>
-          </div>
-          {loggedIn ? (
-            <div className='px-7 py-1'>
-            <Link to='/Login'>
-              <button onClick={logout} className='bg-gray-600 rounded-lg text-sm hover:bg-[#323b49]'>Log Out</button>
-            </Link>
-            </div>
-          ) : (
-            <div className='px-7 py-0.5'>
-            <Link to='/Login'>
-              <button className='bg-gray-600 rounded-lg text-sm hover:bg-[#323b49]'>Sign In</button>
-            </Link>
-            </div>
+              {loggedIn && (
+                <Link to='/Login'>
+                  <ListItem onClick={logout} className=' py-2 mt-4 flex justify-center items-center text-sm text-white bg-gray-600 hover:text-white hover:bg-[#323b49] focus:text-white focus:bg-gray-600 active:bg-gray-600 active:text-white'>
+                      Log Out
+                  </ListItem>
+                </Link>
+              )}
+            </List>
+          </Card>
           )}
-        </div>
+
+          {/* DRAWER */}
+          {!isDesktopView && (
+          <Drawer 
+          open={openDrawer} 
+          className='mt-[62px] w-full bg-gray-800' 
+          onClose={handleOpenDrawer}
+          // overlay={false}
+          overlayProps={{
+            className:' z-40 mt-[62px]'
+          }}
+        >
+            <div className="mb-8 p-8">
+              <Typography variant="h5" className='uppercase text-center font-semibold text-2xl' color="white">
+                asset<br />management
+              </Typography>
+              <div className="relative">
+                  <button 
+                    onClick={handleOpenDrawer} 
+                    className={`absolute bottom-10 -right-14 bg-gray-800 border-2 rounded-full w-10 h-8 text-white ${openDrawer ? 'border-[#606060]' : 'border-[#efefef]'}`}
+                  >
+                    <FontAwesomeIcon 
+                      icon={faAnglesLeft}
+                      size='xs'
+                      style={{transform: openDrawer ? 'rotate(0deg)' : 'rotate(180deg)', 
+                              transition: 'transform 0.8s ease', 
+                            }}
+                    />
+                  </button>
+              </div>
+            </div>
+            <List className='px-6'>
+              {/* DASHBOARD */}
+              <Link to='/'>
+                <ListItem className='px-4 text-white hover:bg-[#323b49] hover:text-white focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
+                  <ListItemPrefix className='mr-3 w-6 h-6'>
+                    <FontAwesomeIcon icon={faChalkboard}/>
+                  </ListItemPrefix>
+                  <Typography>
+                    Dashboard
+                  </Typography>
+                </ListItem>
+              </Link>
+              {/* CHAT */}
+              <Link to='/chat'>
+                <ListItem className='px-4 text-white hover:bg-[#323b49] hover:text-white focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
+                  <ListItemPrefix className='mr-3 w-6 h-6'>
+                    <FontAwesomeIcon icon={faComments} />
+                  </ListItemPrefix>
+                  <Typography>
+                    Chat
+                  </Typography>
+                  <ListItemSuffix>
+                    <Chip value="14" size="sm" variant="white" color="blue-gray" className="rounded-full" />
+                  </ListItemSuffix>
+                </ListItem>
+              </Link>
+              {/* ASSET */}
+              <Accordion
+                open={openSubmenu === 1}
+                icon={
+                  <FontAwesomeIcon icon={faChevronDown} size=''
+                    className={`mx-auto items-center flex h-3 w-4 transition-transform ${openSubmenu === 1 ? "rotate-180" : ""}`}
+                  />
+                }
+              >
+                <ListItem className="p-0 px-1 hover:bg-[#323b49] active:bg-gray-600 focus:bg-gray-800 bg-gray-800" selected={openSubmenu === 1}>
+                  <AccordionHeader onClick={() => handleOpenSubmenu(1)} className="border-b-0 p-3 bg-none text-white hover:text-white">
+                    <ListItemPrefix className='mr-3 w-6 h-6'>
+                      <FontAwesomeIcon icon={faComputer} />
+                    </ListItemPrefix>
+                    <Typography color="white" className="mr-auto font-normal">
+                      Assets
+                    </Typography>
+                  </AccordionHeader>
+                </ListItem>
+                <AccordionBody className="p-0 bg-gray-600">
+                  <List className="p-0 gap-0">
+                    <Link to='/listasset'>
+                      <ListItem className='px-4 text-white hover:bg-[#374151] hover:text-white hover:rounded-none focus:rounded-none focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
+                        <ListItemPrefix className='mr-3 w-6 h-6'>
+                          <FontAwesomeIcon icon={faList} />
+                        </ListItemPrefix>
+                        List of Asset
+                      </ListItem>
+                    </Link>
+                    {Role === 2 || Role === 1 ? (
+                      <Link to='/addasset'>
+                        <ListItem className='px-4 text-white hover:bg-[#374151] hover:text-white hover:rounded-none focus:rounded-none focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
+                          <ListItemPrefix className='mr-3 w-6 h-6'>
+                            <FontAwesomeIcon icon={faPlus} />
+                          </ListItemPrefix>
+                          Add an Asset
+                        </ListItem>
+                      </Link>
+                    ) : null}
+                    {loggedIn ? (
+                      <Link to='/lease'>
+                        <ListItem className='px-4 text-white hover:bg-[#374151] hover:text-white hover:rounded-none focus:rounded-none focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
+                          <ListItemPrefix className='mr-3 w-6 h-6'>
+                            <FontAwesomeIcon icon={faHandHolding} />
+                          </ListItemPrefix>
+                          Lease
+                        </ListItem>
+                      </Link>
+                    ) : null}
+                    {loggedIn ? (
+                      <Link to='/return'>
+                        <ListItem className='px-4 text-white hover:bg-[#374151] hover:text-white hover:rounded-none focus:rounded-none focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
+                          <ListItemPrefix className='mr-3 w-6 h-6'>
+                            <FontAwesomeIcon icon={faRotateLeft} />
+                          </ListItemPrefix>
+                          Return
+                        </ListItem>
+                      </Link>
+                    ) : null}
+                    {Role === 2 || Role === 1 ? (
+                      <Link to='/submitted'>
+                        <ListItem className='px-4 text-white hover:bg-[#374151] hover:text-white hover:rounded-none focus:rounded-none focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
+                          <ListItemPrefix className='mr-3 w-6 h-6'>
+                            <FontAwesomeIcon icon={faPaperPlane} />
+                          </ListItemPrefix>
+                          Submitted
+                        </ListItem>
+                      </Link>
+                    ) : null}
+                  </List>
+                </AccordionBody>
+              </Accordion>
+              {/* REPORT */}
+              <Accordion
+                open={openSubmenu === 2}
+                icon={
+                  <FontAwesomeIcon icon={faChevronDown} size=''
+                    className={`mx-auto items-center flex h-3 w-4 transition-transform ${openSubmenu === 1 ? "rotate-180" : ""}`}
+                  />
+                }
+              >
+                <ListItem className="p-0 px-1 hover:bg-[#323b49] active:bg-gray-600 focus:bg-gray-800 bg-gray-800" selected={openSubmenu === 2}>
+                  <AccordionHeader onClick={() => handleOpenSubmenu(2)} className="border-b-0 p-3 bg-none text-white hover:text-white">
+                    <ListItemPrefix className='mr-3 w-6 h-6'>
+                      <FontAwesomeIcon icon={faBook} />
+                    </ListItemPrefix>
+                    <Typography color="white" className="mr-auto font-normal">
+                      Reports
+                    </Typography>
+                  </AccordionHeader>
+                </ListItem>
+                <AccordionBody className="p-0 bg-gray-600">
+                  <List className="p-0 gap-0">
+                    {Role === 2 || Role === 1 ? (
+                      <Link to='/history'>
+                        <ListItem className='px-4 text-white hover:bg-[#374151] hover:text-white hover:rounded-none focus:rounded-none focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
+                          <ListItemPrefix className='mr-3 w-6 h-6'>
+                            <FontAwesomeIcon icon={faClockRotateLeft}/>
+                          </ListItemPrefix>
+                          History
+                        </ListItem>
+                      </Link>
+                    ) : null}
+                    <Link to='/myreport'>
+                      <ListItem className='px-4 text-white hover:bg-[#374151] hover:text-white hover:rounded-none focus:rounded-none focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
+                        <ListItemPrefix className='mr-3 w-6 h-6'>
+                          <FontAwesomeIcon icon={faFileLines} />
+                        </ListItemPrefix>
+                        My Report
+                      </ListItem>
+                    </Link>
+                  </List>
+                </AccordionBody>
+              </Accordion>
+              {/* MANAGE USER */}
+              {Role === 2 || Role === 1 ? (
+              <Link to='/manageuser'>
+                <ListItem className='px-4 text-white hover:bg-[#323b49] hover:text-white focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
+                  <ListItemPrefix className='mr-3 w-6 h-6'>
+                    <FontAwesomeIcon icon={faUserGear}/>
+                  </ListItemPrefix>
+                  <Typography>
+                    Manage User
+                  </Typography>
+                </ListItem>
+              </Link>
+              ) : null}
+              {loggedIn && (
+                <Link to='/Login'>
+                  <ListItem onClick={logout} className=' py-2 mt-4 flex justify-center items-center text-sm text-white bg-gray-600 hover:text-white hover:bg-[#323b49] focus:text-white focus:bg-gray-600 active:bg-gray-600 active:text-white'>
+                      Log Out
+                  </ListItem>
+                </Link>
+              )}
+            </List>
+          </Drawer>
+          )}
+
+        
         {/* MAIN CONTENT */}
-        <div className='bg-[#efefef] p-[20px] flex flex-col min-h-screen w-screen mt-[60px]' style={mainContentStyles}>
+        <div 
+          className='bg-[#efefef] p-[20px] flex flex-col min-h-screen w-screen mt-[60px]' 
+          style={{marginLeft: isDesktopView ? (openSidebar ? '296px' : '0') : '0', 
+                        width: isDesktopView ? (openSidebar ? 'calc(100% - 296px)' : '100%') : '100%', 
+                        transition: 'margin 0.5s ease-in-out, width 0.5s ease-in-out',
+                      }}
+        >
           <Routes>
           {loggedIn ? (
             <Route path="/" element={<Dashboard />} />
@@ -396,6 +657,7 @@ const Home = () =>  {
             <Route path="*" element={<Notfound />} />
             <Route path="/test" element={<Test />} />
             <Route path="/qrgen" element={<Qrgen />} />
+            <Route path="/offline" element={<Offline />} />
           </Routes>
         </div>
       </div>

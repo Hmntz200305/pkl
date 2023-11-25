@@ -9,9 +9,88 @@ const Test = () => {
   const [result, setResult] = useState('');
   const [scannedData, setScannedData] = useState([]);
   const [scanning, setScanning] = useState(false);
+  //New
+  const { setNotification, setNotificationInfo, setNotificationStatus } = useAuth();
+  const [AssetID, setAssetID] = useState();
+  const [AssetName, setAssetName] = useState();
+  const [AssetDesc, setAssetDesc] = useState();
+  const [AssetBrand, setAssetBrand] = useState();
+  const [AssetModel, setAssetModel] = useState();
+  const [AssetStatus, setAssetStatus] = useState();
+  const [AssetLocation, setAssetLocation] = useState();
+  const [AssetCategory, setAssetCategory] = useState();
+  const [AssetSN, setAssetSN] = useState();
+  const [isLoading, setIsLoading] = useState();
+  const [tableData, setTableData] = useState([]);
+
+  const DataQrscan = async () => {
+    try {
+      setIsLoading(true); 
+      const formData = new FormData();
+
+      formData.append('AssetID', AssetID);
+      formData.append('AssetName', AssetName);
+      formData.append('AssetDesc', AssetDesc);
+      formData.append('AssetBrand', AssetBrand);
+      formData.append('AssetModel', AssetModel);
+      formData.append('AssetStatus', AssetStatus);
+      formData.append('AssetLocation', AssetLocation);
+      formData.append('AssetCategory', AssetCategory);
+      formData.append('AssetSN', AssetSN);
+
+      const response = await fetch("https://sipanda.online:8443/api/qrscanner", {
+        method: "PUT ",
+        body: formData,
+      });
+
+      if (response.status === 200) {
+        const data = await response.json();
+        setQRCode(data.qr);
+        setNotification(data.message);
+        setNotificationStatus(true);
+      } else {
+        const data = await response.json();
+        setNotification(data.message);
+        setNotificationStatus(true);
+        setNotificationInfo('Error');
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    console.log('MediaDevices didukung:', !!navigator.mediaDevices);
+    // Check if any of the form fields is not empty
+    const hasData = AssetID || AssetName || AssetDesc || AssetBrand || AssetModel || AssetStatus || AssetLocation || AssetCategory || AssetSN ;
+  
+    // If at least one field is not empty, update the tableData and clear the form fields
+    if (hasData) {
+      setTableData([
+        ...tableData,
+        {
+          AssetID,
+          AssetName,
+          AssetDesc,
+          AssetBrand,
+          AssetModel,
+          AssetStatus,
+          AssetLocation,
+          AssetCategory,
+          AssetSN,
+        },
+      ]);
+      setAssetID('');
+      setAssetName('');
+      setAssetDesc('');
+      setAssetBrand('');
+      setAssetModel('');
+      setAssetStatus('');
+      setAssetLocation('');
+      setAssetCategory('');
+      setAssetSN('');
+    }
   }, []);
 
   const handleScan = (data) => {
@@ -51,72 +130,61 @@ const Test = () => {
     setScanning(false);
   };
 
+  const toggleScanner = () => {
+    setIsScanning((prevIsScanning) => !prevIsScanning);
+  };
+  
   const columns = [
     {
-        name: 'No',
-        selector: 'no',
-        sortable: true,
-        export: true
-        },
-        {
         name: 'ID Asset',
-        selector: 'id',
+        selector: row => row['AssetID'],
         export: true
         },
         {
         name: 'Name',
-        selector: 'name',
+        selector: row => row['AssetName'],
         export: true
         },
         {
         name: 'Description',
-        selector: 'description',
+        selector: row => row['AssetDesc'],
         export: true
         },
         {
         name: 'Brand',
-        selector: 'brand',
+        selector: row => row['AssetBrand'],
         export: true
         },
         {
         name: 'Model',
-        selector: 'model',
+        selector: row => row['AssetModel'],
         export: true
         },
         {
         name: 'Status',
-        selector: 'status',
+        selector: row => row['AssetStatus'],
         export: true
         },
         {
         name: 'Location',
-        selector: 'location',
+        selector: row => row['AssetLocation'],
         export: true
         },
         {
         name: 'Category',
-        selector: 'category',
+        selector: row => row['AssetCategory'],
         export: true
         },
         {
         name: 'SN',
-        selector: 'sn',
+        selector: row => row['AssetSN'],
         export: true
         },
     ]
 
-    const fakedata = useState([
-      { no: '1', id: 'Laptop', lease: '2023-10-11', return: '2023-10-20', time: '10' },
-    ]);  
 
   return (
     <>
-      <div className='p-2'>
-        <div className='bg-white mb-5 rounded-2xl p-4 shadow'>
-            <h2 className=''>Welcome, QRgenerate page :)</h2>
-        </div>
-      </div>
-
           <div className="p-2">
               {scanning ? (
                 <div>
@@ -126,25 +194,21 @@ const Test = () => {
                     onScan={handleScan}
                     style={{ width: '40%' }}
                   />
-                  <button type="button" onClick={stopScan} style={{ position: 'absolute', top: 0, right: 0 }}>
-                    Close
-                  </button>
+                
                 </div>
               ) : null}
               <div className='flex'>
                 <button className='main-btn' type="button" onClick={startScan}>Start</button>
                 <button className='main-btn' type="submit" onClick={stopScan}>Stop</button>
-                <div className='flex ml-auto'>
-                  <button className='main-btn' onClick={stopScan}>Close</button>
-                </div>
-              </div>
+
+              </div>  
           </div>
 
           <div className='p-2'>
             <div className='bg-white p-2'>
                 <DataTable
                     columns={columns}
-                    data={fakedata}
+                    data={tableData}
                     noHeader
                     defaultSortField='no'
                     defaultSortAsc={false}

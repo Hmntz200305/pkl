@@ -190,7 +190,7 @@ const ListAsset = () => {
 
 
     const handleDownload = () => {
-      const fileURL = '/static/template/MyReport.csv'; // Gantilah dengan URL file yang sesuai
+      const fileURL = 'https://sipanda.online:8443/static/template/MyReport.csv'; // Gantilah dengan URL file yang sesuai
       const a = document.createElement('a');
       a.href = fileURL;
       a.download = 'MyReport.csv'; // Gantilah dengan nama file yang sesuai
