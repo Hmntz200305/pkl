@@ -255,10 +255,13 @@ export const AuthProvider = ({ children }) => {
       .catch((error) => {
         console.error('Error fetching status data:', error);
       });
-  }
+  };
+
+  const [openSidebar, setOpenSidebar] = useState(true);
+  const [isDesktopView, setIsDesktopView] = useState(window.innerWidth > 768);
   
   return (
-    <AuthContext.Provider value={{ token, email, username, loggedIn, login, logout, refreshAssetData, DataListAsset, refreshStatusList, StatusOptions, refreshLocationList, LocationOptions, refreshCategoryList, CategoryOptions, refreshManageUser, ManageUserData, Role, DataListAssetExcept, refreshAssetDataExcept, AdminList, refreshAdminList, SubmitedList, refreshSubmitedList, refreshDashboardInfo, DashboardInfo, onRequest, inLoans, CountinLoans, refreshDataLoan, DataLoan, Roles, refreshHistoryTicket, HistoryTicket, refreshHistoryLoanData, HistoryLoanData, refreshMyReport, MyReport, setNotification, Notification, setNotificationStatus, NotificationStatus, NotificationInfo, setNotificationInfo }}>
+    <AuthContext.Provider value={{ token, email, username, loggedIn, login, logout, refreshAssetData, DataListAsset, refreshStatusList, StatusOptions, refreshLocationList, LocationOptions, refreshCategoryList, CategoryOptions, refreshManageUser, ManageUserData, Role, DataListAssetExcept, refreshAssetDataExcept, AdminList, refreshAdminList, SubmitedList, refreshSubmitedList, refreshDashboardInfo, DashboardInfo, onRequest, inLoans, CountinLoans, refreshDataLoan, DataLoan, Roles, refreshHistoryTicket, HistoryTicket, refreshHistoryLoanData, HistoryLoanData, refreshMyReport, MyReport, setNotification, Notification, setNotificationStatus, NotificationStatus, NotificationInfo, setNotificationInfo, openSidebar, setOpenSidebar, }}>
       {children}
     </AuthContext.Provider>
   );

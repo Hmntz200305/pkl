@@ -9,11 +9,42 @@ import Modal from 'react-modal';
 Modal.setAppElement('#root');
 
 const Return = () => {
-    const { token, Role, refreshDataLoan, DataLoan, setNotification, setNotificationStatus } = useAuth();
+    const { token, Role, refreshDataLoan, DataLoan, setNotification, setNotificationStatus, openSidebar, setOpenSidebar } = useAuth();
     const [dataWithRemainingTime, setDataWithRemainingTime] = useState([]);
     const [selectedLoanID, setselectedLoanID] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [selectedAssetDetails, setSelectedAssetDetails] = useState([]);
+    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+    const isMobile = windowWidth <= 768;
+    const [isDesktopView, setIsDesktopView] = useState(window.innerWidth > 768);
+
+
+    const handleResizeMobile = () => {
+        setIsDesktopView(window.innerWidth > 768);
+    }; 
+    
+    const handleResizeApp = () => {
+      if (window.innerWidth <= 768) {
+        setOpenSidebar(false);
+      } else {
+        setOpenSidebar(true);
+      }
+    };
+    
+    useEffect(() => {
+        window.addEventListener('resize', handleResizeMobile);
+  
+        return () => {
+        window.removeEventListener('resize', handleResizeMobile);
+        };
+    }, []);
+  
+    useEffect(() => {
+      window.addEventListener('resize', handleResizeApp);
+      return () => {
+        window.removeEventListener('resize', handleResizeApp);
+      };
+    }, []);
 
     useEffect(() => {
         const refreshData = async () => {
@@ -233,24 +264,50 @@ const Return = () => {
                 </div>
             </div>
 
-            <Modal
-                isOpen={showModalAsset}
-                onRequestClose={closeModalAssetHandle}
-                contentLabel="Contoh Modal"
-                overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center"
-                className="modal-content bg-white w-1/2 p-4 rounded shadow-md"
-                shouldCloseOnOverlayClick={false}
-                >
-                <h1>Ini adalah detail lengkap asset</h1>
-                <DataTable
-                    columns={morecolumn}
-                    data={selectedAssetDetails}
-                    highlightOnHover
-                />
-                <button onClick={closeModalAssetHandle} className="main-btn mt-4">
-                    Close
-                </button>
-            </Modal>
+            {isDesktopView && (
+                <Modal
+                    isOpen={showModalAsset}
+                    onRequestClose={closeModalAssetHandle}
+                    contentLabel="Contoh Modal"
+                    overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center"
+                    className={`modal-content bg-transparent p-4 w-screen ${openSidebar ? ' pl-[315px]' : ''}`}
+                    shouldCloseOnOverlayClick={false}
+                    >
+                    <div className='p-2 py-4 bg-white'>
+                        <h1>Ini adalah detail lengkap asset</h1>
+                            <DataTable
+                                columns={morecolumn}
+                                data={selectedAssetDetails}
+                                highlightOnHover
+                            />
+                        <button onClick={closeModalAssetHandle} className="main-btn mt-4">
+                            Close
+                        </button>
+                    </div>
+                </Modal>
+            )}
+            {!isDesktopView && (
+                <Modal
+                    isOpen={showModalAsset}
+                    onRequestClose={closeModalAssetHandle}
+                    contentLabel="Contoh Modal"
+                    overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center"
+                    className='modal-content bg-transparent p-4 w-screen'
+                    shouldCloseOnOverlayClick={false}
+                    >
+                    <div className='p-2 py-4 bg-white'>
+                        <h1>Ini adalah detail lengkap asset</h1>
+                            <DataTable
+                                columns={morecolumn}
+                                data={selectedAssetDetails}
+                                highlightOnHover
+                            />
+                        <button onClick={closeModalAssetHandle} className="main-btn mt-4">
+                            Close
+                        </button>
+                    </div>
+                </Modal>
+            )}
 
             <div className='p-2'>
                 <DataTable

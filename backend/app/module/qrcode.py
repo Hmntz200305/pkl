@@ -1,6 +1,6 @@
 from flask import request, current_app
 from flask_restful import Resource
-from app.config_flask import SECRET_KEY, QRCode_FOLDER, server_ip
+from app.config_flask import SECRET_KEY, QRCode_FOLDER, server_ip, check_whitelist
 from werkzeug.utils import secure_filename
 from app.config_db import get_db_connection
 import qrcode
@@ -9,6 +9,7 @@ import os
 
 
 class QrGenerator(Resource):
+    @check_whitelist
     def post(self):
         data = request.form
         
@@ -61,6 +62,7 @@ class QrGenerator(Resource):
         return {"message": "QR Code has been created", "qr": link}, 200
 
 class QrScanner(Resource):
+    @check_whitelist
     def post(self):
         data = request.json
         
@@ -96,7 +98,7 @@ class QrScanner(Resource):
         try:
             # Masukkan data ke dalam tabel assets
             image_path = (current_app.config['server_ip'] + '/static/Default/images.jfif')
-            lmd.execute('INSERT INTO assets (asset, name, description, brand, model, status, location, category, serialnumber, photo) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)',
+            lmd.execute('INSERT INTO assets (asset, name, description, brand, model, status, location, category, serialnumber, photo) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)',
                         (AssetID, AssetName, AssetDesc, AssetBrand, AssetModel, AssetStatus, AssetLocation, AssetCategory, AssetSN, image_path))
             
             db.commit()

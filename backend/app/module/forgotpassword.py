@@ -1,6 +1,6 @@
 from app.config_db import get_db_connection
 from flask_restful import Resource, reqparse
-from app.config_flask import SECRET_KEY
+from app.config_flask import SECRET_KEY, check_whitelist
 from app.config_mail import mail  
 from flask_mail import Message
 from flask import url_for
@@ -15,6 +15,7 @@ def validate_reset(username, email, password):
 key = URLSafeTimedSerializer('lmd%055')
 
 class ForgotPassword(Resource):
+    @check_whitelist
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('FUsername', type=str, required=True)
@@ -53,7 +54,7 @@ class VerifyEmailForgotPw(Resource):
             password = user_info['password']
             lmd.execute('UPDATE users set password = %s where username = %s and email = %s', (password, username, email))
             db.commit()
-            return {'message': 'Password berhasil di reset'}
+            return redirect('https://sipanda.online:2096')
         except SignatureExpired:
             user_info = {
                 'username': username,

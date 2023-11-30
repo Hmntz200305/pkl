@@ -4,9 +4,11 @@ import pandas as pd
 from flask_restful import Resource
 from werkzeug.utils import secure_filename
 from flask import current_app
+from app.config_flask import check_whitelist
 import os
 
 class UploadCsv(Resource):
+    @check_whitelist
     def post(self):
         db, lmd = get_db_connection()
         image_path = 'http://sipanda.online:5000/static/Default/images.jfif'

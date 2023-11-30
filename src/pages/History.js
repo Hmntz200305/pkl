@@ -1,19 +1,15 @@
 import React, { useEffect, useState, useRef } from 'react'
 import DataTable from 'react-data-table-component';
-import DataTableExtensions from 'react-data-table-component-extensions';
-import { faDownload, faFileCsv, faFileExport, faUpload, faFileImport, faPenToSquare, faPrint, faTrash, faFilePdf } from '@fortawesome/free-solid-svg-icons';
+import { faFileCsv, faFilePdf } from '@fortawesome/free-solid-svg-icons';
 import 'react-data-table-component-extensions/dist/index.css';
 import Modal from 'react-modal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleInfo } from '@fortawesome/free-solid-svg-icons';
 import { useAuth } from '../AuthContext';
-import { MaterialReactTable, createMRTColumnHelper, useMaterialReactTable, } from 'material-react-table';
+import { MaterialReactTable, createMRTColumnHelper, } from 'material-react-table';
 import { mkConfig, generateCsv, download } from 'export-to-csv';
 import { jsPDF } from 'jspdf';
-import { Button} from '@mui/material';
 import autoTable from 'jspdf-autotable';
-import FileDownloadIcon from '@mui/icons-material/FileDownload';
-import { Box, button, colors } from '@mui/material';
 import { Tabs, TabsHeader, TabsBody, Tab, TabPanel, } from "@material-tailwind/react";
 Modal.setAppElement('#root');
 
@@ -152,6 +148,7 @@ const History = () => {
             </div>
         )
     };
+
     const PeminjamanContent = () => {
 
         const handleExportCsvPeminjaman = (rows) => {
@@ -284,9 +281,39 @@ const History = () => {
     };
     
 
-    const { refreshHistoryTicket, HistoryTicket, refreshHistoryLoanData, HistoryLoanData } = useAuth();
+    const { refreshHistoryTicket, HistoryTicket, refreshHistoryLoanData, HistoryLoanData, openSidebar, setOpenSidebar, } = useAuth();
     const [selectedAssetDetails, setSelectedAssetDetails] = useState([]);
-    const tableRef = useRef(null)
+    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+    const isMobile = windowWidth <= 768;
+    const [isDesktopView, setIsDesktopView] = useState(window.innerWidth > 768);
+    const tableRef = useRef(null);
+
+    const handleResizeMobile = () => {
+        setIsDesktopView(window.innerWidth > 768);
+    }; 
+    
+    const handleResizeApp = () => {
+      if (window.innerWidth <= 768) {
+        setOpenSidebar(false);
+      } else {
+        setOpenSidebar(true);
+      }
+    };
+    
+    useEffect(() => {
+        window.addEventListener('resize', handleResizeMobile);
+  
+        return () => {
+        window.removeEventListener('resize', handleResizeMobile);
+        };
+    }, []);
+  
+    useEffect(() => {
+      window.addEventListener('resize', handleResizeApp);
+      return () => {
+        window.removeEventListener('resize', handleResizeApp);
+      };
+    }, []);
 
     useEffect(() =>{
         refreshHistoryTicket();
@@ -533,25 +560,51 @@ const History = () => {
                     </Tabs>
                 </div>
             </div>
-
-            <Modal
-                isOpen={showMoreDetail}
-                onRequestClose={closeMoreDetailHandler}
-                contentLabel="Contoh Modal"
-                overlayClassName="fixed inset-0 z-10 bg-gray-500 bg-opacity-75 flex items-center justify-center"
-                className="modal-content bg-white w-1/2 p-4 rounded shadow-md"
-                shouldCloseOnOverlayClick={false}
-                >
-                <h1>Ini adalah detail lengkap asset HEHHE</h1>
-                <DataTable
-                    columns={HistoryMore}
-                    data={selectedAssetDetails}
-                    highlightOnHover
-                />
-                <button onClick={closeMoreDetailHandler} className="main-btn mt-4">
-                    Close
-                </button>
-            </Modal>
+            
+            {isDesktopView && (
+                <Modal
+                    isOpen={showMoreDetail}
+                    onRequestClose={closeMoreDetailHandler}
+                    contentLabel="Contoh Modal"
+                    overlayClassName="fixed z-10 inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center"
+                    className={`modal-content bg-transparent p-4 w-screen ${openSidebar ? ' pl-[315px]' : ''}`}
+                    shouldCloseOnOverlayClick={false}
+                    >
+                    <div className='p-2 py-4 bg-white'>
+                        <h1>Ini adalah detail lengkap asset</h1>
+                            <DataTable
+                                columns={HistoryMore}
+                                data={selectedAssetDetails}
+                                highlightOnHover
+                            />
+                        <button onClick={closeMoreDetailHandler} className="main-btn mt-4">
+                            Close
+                        </button>
+                    </div>
+                </Modal>
+            )}
+            {!isDesktopView && (
+                <Modal
+                    isOpen={showMoreDetail}
+                    onRequestClose={closeMoreDetailHandler}
+                    contentLabel="Contoh Modal"
+                    overlayClassName="fixed z-10 inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center"
+                    className='modal-content bg-transparent p-4 w-screen'
+                    shouldCloseOnOverlayClick={false}
+                    >
+                    <div className='p-2 py-4 bg-white'>
+                        <h1>Ini adalah detail lengkap asset</h1>
+                            <DataTable
+                                columns={HistoryMore}
+                                data={selectedAssetDetails}
+                                highlightOnHover
+                            />
+                        <button onClick={closeMoreDetailHandler} className="main-btn mt-4">
+                            Close
+                        </button>
+                    </div>
+                </Modal>
+            )}
         </>
     )
 }

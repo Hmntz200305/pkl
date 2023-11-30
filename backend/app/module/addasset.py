@@ -1,7 +1,7 @@
 from app.config_db import get_db_connection
 from flask_restful import Resource
 from flask import jsonify, request
-from app.config_flask import SECRET_KEY, UPLOAD_FOLDER, server_ip
+from app.config_flask import SECRET_KEY, UPLOAD_FOLDER, server_ip, check_whitelist
 from werkzeug.utils import secure_filename
 from flask import current_app
 import socket
@@ -25,6 +25,7 @@ def validate_addasset(ids, nama, deskripsi, brand, model, status, lokasi, katego
     return True
 
 class AddAsset(Resource):
+    @check_whitelist
     def post(self):
         db, lmd = get_db_connection()
         
@@ -84,6 +85,7 @@ class AddAsset(Resource):
 
 
 class AddStatus(Resource):
+    @check_whitelist
     def post(self):
         db ,lmd = get_db_connection()
         
@@ -118,6 +120,7 @@ class AddStatus(Resource):
     
 
 class AddLocation(Resource):
+    @check_whitelist
     def post(self):
         db ,lmd = get_db_connection()
         
@@ -151,6 +154,7 @@ class AddLocation(Resource):
                     return{"message": "you didnt have access to run this command"}
                 
 class AddCategory(Resource):
+    @check_whitelist
     def post(self):
         db ,lmd = get_db_connection()
         

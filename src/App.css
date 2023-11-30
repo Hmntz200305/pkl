@@ -88,18 +88,6 @@
     cursor: pointer;
     transition: background-color 0.3s ease-in-out;
 }
-.addtoggle-btn {
-    background-color: rgb(31 41 55);
-    color: white;
-    border: none;
-    border-radius: 5px;
-    padding: 10px 15px;
-    margin-left: 5px;
-    cursor: pointer;
-}
-.dashboard-label {
-    /* color: #666; */
-}
 
 .notification {
     transform: translateX(100%); /* Initial position for slide-out */

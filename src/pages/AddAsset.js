@@ -3,12 +3,10 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAuth } from '../AuthContext';
 import { Input, Menu, MenuList, MenuItem, MenuHandler, Button } from "@material-tailwind/react";
+import Modal from 'react-modal';
 
 const AddAsset = () => {
-    const { token, Role, refreshAssetData, refreshStatusList, StatusOptions, refreshLocationList, LocationOptions, refreshCategoryList, CategoryOptions, setNotification, setNotificationStatus, setNotificationInfo } = useAuth();
-    const [showStatus, setShowStatus] = useState(false);
-    const [showLocation, setShowLocation] = useState(false);
-    const [showCategory, setShowCategory] = useState(false);
+    const { token, Role, refreshAssetData, refreshStatusList, StatusOptions, refreshLocationList, LocationOptions, refreshCategoryList, CategoryOptions, setNotification, setNotificationStatus, setNotificationInfo, openSidebar, setOpenSidebar } = useAuth();
     const [newStatus, setnewStatus] = useState("");
     const [newLocation, setnewLocation] = useState("");
     const [newCategory, setnewCategory] = useState("");
@@ -27,7 +25,60 @@ const AddAsset = () => {
     const [inputValueLocation, setInputValueLocation] = useState('');
     const [inputValueCategory, setInputValueCategory] = useState('');
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+    const isMobile = windowWidth <= 768;
+    const [isDesktopView, setIsDesktopView] = useState(window.innerWidth > 768);
+    const [modalStatus, setModalStatus] = useState(false);
+    const [modalLocation, setModalLocation] = useState(false);
+    const [modalCategory, setModalCategory] = useState(false);
+
+    const handleResizeMobile = () => {
+        setIsDesktopView(window.innerWidth > 768);
+    }; 
     
+    const handleResizeApp = () => {
+      if (window.innerWidth <= 768) {
+        setOpenSidebar(false);
+      } else {
+        setOpenSidebar(true);
+      }
+    };
+    
+    useEffect(() => {
+        window.addEventListener('resize', handleResizeMobile);
+  
+        return () => {
+        window.removeEventListener('resize', handleResizeMobile);
+        };
+    }, []);
+  
+    useEffect(() => {
+      window.addEventListener('resize', handleResizeApp);
+      return () => {
+        window.removeEventListener('resize', handleResizeApp);
+      };
+    }, []);
+
+    const openModalStatus = () => {
+      setModalStatus(true);
+    };
+    const closeModalStatus = () => {
+      setModalStatus(false);
+    };
+
+    const openModalLocation = () => {
+      setModalLocation(true);
+    };
+    const closeModalLocation = () => {
+      setModalLocation(false);
+    };
+
+    const openModalCategory = () => {
+      setModalCategory(true);
+    };
+    const closeModalCategory = () => {
+      setModalCategory(false);
+    };
+
     const handleOptionSelectStatus = (option) => {
       setInputValueStatus(option);
       setaddAssetStatus(option);
@@ -40,20 +91,7 @@ const AddAsset = () => {
       setInputValueCategory(option);
       setaddAssetCategory(option);
     };
-  
-    const handleResize = () => {
-      setWindowWidth(window.innerWidth);
-    };
-  
-    useEffect(() => {
-      window.addEventListener('resize', handleResize);
-      return () => {
-        window.removeEventListener('resize', handleResize);
-      };
-    }, []);
-  
-    const isMobile = windowWidth <= 640;
-
+    
 
     const handleImageChange = (e) => {
       const file = e.target.files[0];
@@ -219,23 +257,6 @@ const AddAsset = () => {
       }
     };
 
-    // Fungsi untuk menampilkan tabel dan menyembunyikan formulir
-    const showStatusHandler = () => {
-        setShowStatus((prev) => !prev);
-        setShowLocation(false);
-        setShowCategory(false);
-    };
-    const showLocationHandler = () => {
-        setShowStatus(false);
-        setShowLocation((prev) => !prev);
-        setShowCategory(false);
-    };
-    const showCategoryHandler = () => {
-        setShowStatus(false);
-        setShowLocation(false);
-        setShowCategory((prev) => !prev);
-    };
-
     return (
         <>
             <div className='p-2'>
@@ -244,79 +265,205 @@ const AddAsset = () => {
                 </div>
             </div>
 
-            {showStatus && (
-            <div className='p-2'>
-                <div className="flex flex-col items-center justify-center bg-white p-2 shadow-xl rounded-2xl">
-                    <div className='flex flex-col text-center mb-2'>
-                        <h1 className="text-2xl font-semibold">Select Action</h1>
-                        <p>Silahkan masukan Status yang ingin ditambahkan</p>
-                    </div>
-                    <div className='form-group'>
-                        <label className='label-text'>Status</label>
-                        <input 
-                        className='form-input pl-5' 
-                        placeholder='Masukan Status' 
-                        value={newStatus}
-                        onChange={(e) => setnewStatus(e.target.value)}
-                        required
-                        />
-                    </div>
-                    <div className="flex space-x-4 mt-5 mb-2">
-                        <button className="main-btn hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded" onClick={showStatusHandler}>Cancel</button>
-                        <button className="main-btn hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded" onClick={() => handleNewStatus(token)}>Tambah</button>
+            {isDesktopView && (
+              <Modal
+                isOpen={modalStatus}
+                onRequestClose={closeModalStatus}
+                contentLabel="Contoh Modal"
+                overlayClassName="fixed inset-0 z-50 bg-gray-500 bg-opacity-75 flex items-center justify-center"
+                className={`modal-content bg-transparent p-4 w-screen ${openSidebar ? ' pl-[315px]' : ''}`}
+                shouldCloseOnOverlayClick={false}
+              >
+                <div className='p-2'>
+                    <div className="flex flex-col bg-white p-2 shadow-xl rounded-2xl">
+                        <div className='flex flex-col text-center mb-2'>
+                            <h1 className="text-2xl font-semibold">Select Action</h1>
+                            <p>Silahkan masukan Status yang ingin ditambahkan</p>
+                        </div>
+                        <div className='flex items-center gap-4 px-4'>
+                          <label className={`pr-4 w-32 text-right ${isMobile ? 'hidden lg:inline' : ''}`}>Status</label>
+                          <Input 
+                            variant='outline'
+                            label='Input Status' 
+                            value={newStatus}
+                            onChange={(e) => setnewStatus(e.target.value)}
+                            required
+                          />
+                        </div>
+                        <div className="flex justify-center space-x-4 mt-5 mb-2">
+                            <button className="main-btn" onClick={closeModalStatus}>Cancel</button>
+                            <button className="main-btn" onClick={() => handleNewStatus(token)}>Tambah</button>
+                        </div>
                     </div>
                 </div>
-            </div>
+              </Modal>
+            )}
+            {!isDesktopView && (
+              <Modal
+                isOpen={modalStatus}
+                onRequestClose={closeModalStatus}
+                contentLabel="Contoh Modal"
+                overlayClassName="fixed inset-0 z-50 bg-gray-500 bg-opacity-75 flex items-center justify-center"
+                className='modal-content bg-transparent p-4 w-screen'
+                shouldCloseOnOverlayClick={false}
+              >
+                <div className='p-2'>
+                    <div className="flex flex-col bg-white p-2 shadow-xl rounded-2xl">
+                        <div className='flex flex-col text-center mb-2'>
+                            <h1 className="text-2xl font-semibold">Select Action</h1>
+                            <p>Silahkan masukan Status yang ingin ditambahkan</p>
+                        </div>
+                        <div className='flex items-center gap-4 px-4'>
+                          <label className={`pr-4 w-32 text-right ${isMobile ? 'hidden lg:inline' : ''}`}>Status</label>
+                          <Input 
+                            variant='outline'
+                            label='Input Status' 
+                            value={newStatus}
+                            onChange={(e) => setnewStatus(e.target.value)}
+                            required
+                          />
+                        </div>
+                        <div className="flex justify-center space-x-4 mt-5 mb-2">
+                            <button className="main-btn" onClick={closeModalStatus}>Cancel</button>
+                            <button className="main-btn" onClick={() => handleNewStatus(token)}>Tambah</button>
+                        </div>
+                    </div>
+                </div>
+              </Modal>
             )}
 
-            {showLocation && (
-            <div className='p-2'>
-                <div className="flex flex-col items-center justify-center bg-white p-2 shadow-xl rounded-2xl">
-                    <div className='flex flex-col text-center mb-2'>
-                        <h1 className="text-2xl font-semibold">Select Action</h1>
-                        <p>Silahkan masukan Lokasi yang ingin ditambahkan</p>
-                    </div>
-                    <div className='form-group'>
-                        <label className='label-text'>Location</label>
-                        <input 
-                        className='form-input pl-5' 
-                        placeholder='Masukan Lokasi' 
-                        value={newLocation}
-                        onChange={(e) => setnewLocation(e.target.value)}
-                        required
-                        />
-                    </div>
-                    <div className="flex space-x-4 mt-5 mb-2">
-                        <button className="main-btn hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded" onClick={showLocationHandler}>Cancel</button>
-                        <button className="main-btn hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded" onClick={() => handleNewLocation(token)}>Tambah</button>
+            {isDesktopView && (
+              <Modal
+                isOpen={modalLocation}
+                onRequestClose={closeModalLocation}
+                contentLabel="Contoh Modal"
+                overlayClassName="fixed inset-0 z-50 bg-gray-500 bg-opacity-75 flex items-center justify-center"
+                className={`modal-content bg-transparent p-4 w-screen ${openSidebar ? ' pl-[315px]' : ''}`}
+                shouldCloseOnOverlayClick={false}
+              >
+                <div className='p-2'>
+                    <div className="flex flex-col bg-white p-2 shadow-xl rounded-2xl">
+                        <div className='flex flex-col text-center mb-2'>
+                            <h1 className="text-2xl font-semibold">Select Action</h1>
+                            <p>Silahkan masukan Lokasi yang ingin ditambahkan</p>
+                        </div>
+                        <div className='flex items-center gap-4 px-4'>
+                            <label className={`pr-4 w-32 text-right ${isMobile ? 'hidden lg:inline' : ''}`}>Location</label>
+                            <Input
+                              variant='outline' 
+                              label='Masukan Lokasi' 
+                              value={newLocation}
+                              onChange={(e) => setnewLocation(e.target.value)}
+                              required
+                            />
+                        </div>
+                        <div className="flex justify-center space-x-4 mt-5 mb-2">
+                            <button className="main-btn" onClick={closeModalLocation}>Cancel</button>
+                            <button className="main-btn" onClick={() => handleNewLocation(token)}>Tambah</button>
+                        </div>
                     </div>
                 </div>
-            </div>
+              </Modal>
+            )}
+            {!isDesktopView && (
+              <Modal
+                isOpen={modalLocation}
+                onRequestClose={closeModalLocation}
+                contentLabel="Contoh Modal"
+                overlayClassName="fixed inset-0 z-50 bg-gray-500 bg-opacity-75 flex items-center justify-center"
+                className='modal-content bg-transparent p-4 w-screen'
+                shouldCloseOnOverlayClick={false}
+              >
+                <div className='p-2'>
+                    <div className="flex flex-col bg-white p-2 shadow-xl rounded-2xl">
+                        <div className='flex flex-col text-center mb-2'>
+                            <h1 className="text-2xl font-semibold">Select Action</h1>
+                            <p>Silahkan masukan Lokasi yang ingin ditambahkan</p>
+                        </div>
+                        <div className='flex items-center gap-4 px-4'>
+                            <label className={`pr-4 w-32 text-right ${isMobile ? 'hidden lg:inline' : ''}`}>Location</label>
+                            <Input
+                              variant='outline' 
+                              label='Masukan Lokasi' 
+                              value={newLocation}
+                              onChange={(e) => setnewLocation(e.target.value)}
+                              required
+                            />
+                        </div>
+                        <div className="flex justify-center space-x-4 mt-5 mb-2">
+                            <button className="main-btn" onClick={closeModalLocation}>Cancel</button>
+                            <button className="main-btn" onClick={() => handleNewLocation(token)}>Tambah</button>
+                        </div>
+                    </div>
+                </div>
+              </Modal>
             )}
 
-            {showCategory && (
-            <div className='p-2'>
-                <div className="flex flex-col items-center justify-center bg-white p-2 shadow-xl rounded-2xl">
-                    <div className='flex flex-col text-center mb-2'>
-                        <h1 className="text-2xl font-semibold">Select Action</h1>
-                        <p>Silahkan masukan Kategori yang ingin ditambahkan</p>
-                    </div>
-                    <div className='form-group'>
-                        <label className='label-text'>Category</label>
-                        <input 
-                        className='form-input pl-5' 
-                        placeholder='Masukan Category' 
-                        value={newCategory}
-                        onChange={(e) => setnewCategory(e.target.value)}
-                        required
-                        />
-                    </div>
-                    <div className="flex space-x-4 mt-5 mb-2">
-                        <button className="main-btn hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded" onClick={showCategoryHandler}>Cancel</button>
-                        <button className="main-btn hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded" onClick={() => handleNewCategory(token)}>Tambah</button>
+            {isDesktopView && (
+              <Modal
+                isOpen={modalCategory}
+                onRequestClose={closeModalCategory}
+                contentLabel="Contoh Modal"
+                overlayClassName="fixed inset-0 z-50 bg-gray-500 bg-opacity-75 flex items-center justify-center"
+                className={`modal-content bg-transparent p-4 w-screen ${openSidebar ? ' pl-[315px]' : ''}`}
+                shouldCloseOnOverlayClick={false}
+              >
+                <div className='p-2'>
+                    <div className="flex flex-col bg-white p-2 shadow-xl rounded-2xl">
+                        <div className='flex flex-col text-center mb-2'>
+                            <h1 className="text-2xl font-semibold">Select Action</h1>
+                            <p>Silahkan masukan Kategori yang ingin ditambahkan</p>
+                        </div>
+                        <div className='flex gap-4 items-center px-4'>
+                        <label className={`pr-4 w-32 text-right ${isMobile ? 'hidden lg:inline' : ''}`}>Category</label>
+                            <Input 
+                              variant='outline'
+                              label='Masukan Category' 
+                              value={newCategory}
+                              onChange={(e) => setnewCategory(e.target.value)}
+                              required
+                            />
+                        </div>
+                        <div className="flex justify-center space-x-4 mt-5 mb-2">
+                            <button className="main-btn" onClick={closeModalCategory}>Cancel</button>
+                            <button className="main-btn" onClick={() => handleNewCategory(token)}>Tambah</button>
+                        </div>
                     </div>
                 </div>
-            </div>
+              </Modal>
+            )}
+            {!isDesktopView && (
+              <Modal
+                isOpen={modalCategory}
+                onRequestClose={closeModalCategory}
+                contentLabel="Contoh Modal"
+                overlayClassName="fixed inset-0 z-50 bg-gray-500 bg-opacity-75 flex items-center justify-center"
+                className='modal-content bg-transparent p-4 w-screen'
+                shouldCloseOnOverlayClick={false}
+              >
+                <div className='p-2'>
+                    <div className="flex flex-col bg-white p-2 shadow-xl rounded-2xl">
+                        <div className='flex flex-col text-center mb-2'>
+                            <h1 className="text-2xl font-semibold">Select Action</h1>
+                            <p>Silahkan masukan Kategori yang ingin ditambahkan</p>
+                        </div>
+                        <div className='flex gap-4 items-center px-4'>
+                        <label className={`pr-4 w-32 text-right ${isMobile ? 'hidden lg:inline' : ''}`}>Category</label>
+                            <Input 
+                              variant='outline'
+                              label='Masukan Category' 
+                              value={newCategory}
+                              onChange={(e) => setnewCategory(e.target.value)}
+                              required
+                            />
+                        </div>
+                        <div className="flex justify-center space-x-4 mt-5 mb-2">
+                            <button className="main-btn" onClick={closeModalCategory}>Cancel</button>
+                            <button className="main-btn" onClick={() => handleNewCategory(token)}>Tambah</button>
+                        </div>
+                    </div>
+                </div>
+              </Modal>
             )}
 
             <div className='p-2'>
@@ -412,7 +559,7 @@ const AddAsset = () => {
                         color='gray'
                         ripple={false}
                         className='absolute right-0 px-4 z-10'
-                        onClick={showStatusHandler}
+                        onClick={openModalStatus}
                       >
                         <FontAwesomeIcon icon={faPlus} />
                       </Button>
@@ -455,7 +602,7 @@ const AddAsset = () => {
                         color='gray'
                         ripple={false}
                         className='absolute top-0 right-0 px-4 z-10'
-                        onClick={showLocationHandler}
+                        onClick={openModalLocation}
                       >
                         <FontAwesomeIcon icon={faPlus} />
                       </Button>
@@ -498,7 +645,7 @@ const AddAsset = () => {
                         color='gray'
                         ripple={false}
                         className='absolute top-0 right-0 px-4 z-10'
-                        onClick={showCategoryHandler}
+                        onClick={openModalCategory}
                       >
                         <FontAwesomeIcon icon={faPlus} />
                       </Button>

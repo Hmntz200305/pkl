@@ -2,10 +2,13 @@ import './App.css';
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faChalkboard,faComputer,faChevronDown,faAnglesLeft, faUserGear,faBook,faList,faPlus,faPaperPlane,faClockRotateLeft,faHandHolding,faRotateLeft, faThumbsUp, faThumbsDown,  faUsersGear, faEnvelope, faUserShield} from '@fortawesome/free-solid-svg-icons';
+import { faCameraRetro, faChalkboard,faComputer,faChevronDown,faAnglesLeft, faUserGear,faBook, faUserPlus, faList,faPlus,faPaperPlane,faClockRotateLeft,faHandHolding,faRotateLeft, faThumbsUp, faThumbsDown,  faEnvelope, faUserShield, faUsers} from '@fortawesome/free-solid-svg-icons';
 import { faComments, faFileLines } from '@fortawesome/free-regular-svg-icons';
-import lmd from './resources/img/logo.png'
-import profile from './resources/profile/p14.png';
+import lmd from './resources/img/logo.png';
+import profileSA from './resources/profile/superadmin.svg';
+import profileAD from './resources/profile/admin.svg'
+import profileUS from './resources/profile/user.svg'
+import profileGU from './resources/profile/guest.svg'
 import Dashboard from './pages/Dashboard';
 import Chat from './pages/Chat';
 import ListAsset from './pages/ListAsset';
@@ -14,39 +17,36 @@ import Return from './pages/Return';
 import Lease from './pages/Lease';
 import Submitted from './pages/Submitted';
 import History from './pages/History';
+import AddUser from './pages/AddUser';
 import ManageUser from './pages/ManageUser';
+import ListUser from './pages/ListUser';
 import Login from './Login';
 import Notfound from './pages/Notfound';
 import MyReport from './pages/MyReport';
-import Test from './pages/Test';
+import QrAdd from './pages/QrAdd';
 import Qrgen from './pages/Qrgen';
 import Offline from './pages/Offline';
+import Development from './pages/development';
+import Coba from './pages/Coba';
+import Verify from './pages/Verify';
 import { AuthProvider, useAuth } from './AuthContext';
 import { Bounce,  ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import {
-  Card,
-  Typography,
-  List,
-  ListItem,
-  ListItemPrefix,
-  ListItemSuffix,
-  Chip,
-  Accordion,
-  AccordionHeader,
-  AccordionBody,
-  Drawer,
+import { Card, Typography, List, ListItem, ListItemPrefix, ListItemSuffix, Chip, Accordion, AccordionHeader, AccordionBody, Drawer, Avatar, Popover, PopoverContent,PopoverHandler, Button
 } from "@material-tailwind/react";
 
-
 const Home = () =>  {
-  const { loggedIn, logout, username, Role, Roles, email, Notification, setNotification, setNotificationStatus, NotificationStatus, NotificationInfo, setNotificationInfo } = useAuth();
-  const [openSidebar, setOpenSidebar] = useState(true);
-  const [openDrawer, setOpenDrawer] = useState(true);
+  const { loggedIn, logout, username, Role, Roles, email, Notification, setNotification, setNotificationStatus, NotificationStatus, NotificationInfo, setNotificationInfo, openSidebar, setOpenSidebar,  } = useAuth();
+  const [openDrawer, setOpenDrawer] = useState(false);
   const [openSubmenu, setOpenSubmenu] = useState(0);
   const [isDesktopView, setIsDesktopView] = useState(window.innerWidth > 768);
   const [rotateButton, setRotateButton] = useState(false);
-
+  const [popoverProfile, setPopoverProfile] = useState(true);
+ 
+  const popoverProfileHandler = {
+    onMouseEnter: () => setPopoverProfile(true),
+    onMouseLeave: () => setPopoverProfile(false),
+  };
   const handleOpenSidebar = () => {
     setOpenSidebar((prev) => !prev);
     setRotateButton(!rotateButton);
@@ -61,7 +61,7 @@ const Home = () =>  {
     setOpenSubmenu(openSubmenu === value ? 0 : value);
   };
 
-  const handleResizeHehe = () => {
+  const handleResizeMobile = () => {
       setIsDesktopView(window.innerWidth > 768);
   }; 
   
@@ -74,10 +74,10 @@ const Home = () =>  {
   };
   
   useEffect(() => {
-      window.addEventListener('resize', handleResizeHehe);
+      window.addEventListener('resize', handleResizeMobile);
 
       return () => {
-      window.removeEventListener('resize', handleResizeHehe);
+      window.removeEventListener('resize', handleResizeMobile);
       };
   }, []);
 
@@ -100,7 +100,6 @@ const Home = () =>  {
     })
   }
 
-  // Notifikasi
   if (NotificationStatus) {
     setTimeout(() => {
       setNotificationStatus(false);
@@ -113,33 +112,48 @@ const Home = () =>  {
     setNotificationInfo('');
   }  
 
-  // popover profile
-  const [showPopoverProfile, setShowPopoverProfile] = useState(false);
-  const togglePopoverProfile = () => {
-    setShowPopoverProfile(!showPopoverProfile);
+  const getProfileImage = (Role) => {
+    if (Role === 2) {
+      return profileSA;
+    } else if (Role === 1) {
+      return profileAD;
+    } else if (Role === 0) {
+      return profileUS;
+    } else {
+      return profileGU;
+    }
   };
 
   return (
     <Router>
       {/* NAVBAR */}
       {loggedIn ? (
-        <div className='flex fixed text-white items-center w-full justify-between z-50 bg-gray-800 h-[60px] px-7'>
+        <div className={`flex fixed z-[9999] text-white items-center w-full justify-between bg-gray-800 h-[60px] px-7 border-b ${openDrawer ? 'border-[#606060]' : 'border-[#efefef]'}`}>
           <div className='flex justify-between items-center'>
-            <div className='logo pl-6'>
-              <img src={lmd} alt='logohe' className='w-[150px] h-auto flex m-auto items-center' />
-            </div>
+            <Link to='https://sipanda.online:2096'>
+              <div className='logo'>
+                <img src={lmd} alt='logohe' className='w-[150px] h-auto flex m-auto items-center' />
+              </div>
+            </Link>
           </div>
 
           <div className='flex items-center'>
             {/* Profile */}
             {loggedIn ? (
-              <div className='flex items-center cursor-default' onMouseEnter={togglePopoverProfile} onMouseLeave={togglePopoverProfile}>
-                <img src={profile} alt='profile' className='w-9 h-9 rounded-full' />
-                <div className='font-semibold ml-1.5 overflow-hidden whitespace-nowrap overflow-ellipsis max-w-[60px]'>
-                  {username}
-                  {showPopoverProfile && (
-                    <div className="flex flex-col opacity-90 justify-center p-4 shadow-md rounded-xl lg:w-[300px] md:w-[250px] sm:w-[220px] bg-gray-900 dark:text-gray-100 absolute top-16 right-1">
-                      <img src={profile} alt='profile' className="w-14 h-14 mx-auto rounded-full dark:bg-gray-500 aspect-square" />
+              <div className='flex items-center cursor-default'>
+                <Popover 
+                  open={popoverProfile} 
+                  handler={setPopoverProfile}
+                >
+                  <PopoverHandler {... popoverProfileHandler}>
+                    <Avatar src={getProfileImage(Role)} alt='profile' className='object-contain brightness-0 invert' withBorder={true} color='white' size='sm' />
+                  </PopoverHandler>
+                    <div className={`font-semibold ml-1.5 overflow-hidden whitespace-nowrap overflow-ellipsis max-w-[60px] ${isDesktopView ? '' : 'hidden'}`}>
+                      {username}
+                    </div>
+                  <PopoverContent {... popoverProfileHandler} className='border-none z-[9999] bg-transparent shadow-none'>
+                    <div className="flex flex-col opacity-90 justify-center shadow-md p-4 rounded-xl bg-gray-900 w-[250px]">
+                      <Avatar src={getProfileImage(Role)} alt='profile' className="object-contain brightness-0 invert mx-auto" size='lg' />
                       <div className="space-y-2 text-center divide-y divide-gray-700">
                         <div className="my-1 space-y-1 break-all">
                           <h2 className=" font-semibold text-sm break-all">{username}</h2>
@@ -156,17 +170,24 @@ const Home = () =>  {
                         </div>
                       </div>
                     </div>
-                  )}
-                </div>
+                  </PopoverContent>
+                </Popover>
               </div>
             ) : (
-              <div className='flex items-center cursor-default' onMouseEnter={togglePopoverProfile} onMouseLeave={togglePopoverProfile}>
-                <img src={profile} alt='profile' className='w-9 h-9 rounded-full' />
-                <div className='font-semibold ml-1.5 overflow-hidden whitespace-nowrap overflow-ellipsis max-w-[60px]'>
-                  Guest
-                  {showPopoverProfile && (
-                    <div className="flex flex-col opacity-90 justify-center p-4 shadow-md rounded-xl lg:w-[300px] md:w-[250px] sm:w-[220px] bg-gray-900 dark:text-gray-100 absolute top-16 right-1">
-                      <img src={profile} alt='profile' className="w-14 h-14 mx-auto rounded-full dark:bg-gray-500 aspect-square" />
+              <div className='flex items-center cursor-default'>
+                <Popover 
+                  open={popoverProfile} 
+                  handler={setPopoverProfile}
+                >
+                  <PopoverHandler {... popoverProfileHandler}>
+                    <Avatar src={getProfileImage(Role)} alt='profile' className='object-contain brightness-0 invert' withBorder={true} color='white' size='sm' />
+                  </PopoverHandler>
+                    <div className={`font-semibold ml-1.5 overflow-hidden whitespace-nowrap overflow-ellipsis max-w-[60px] ${isDesktopView ? '' : 'hidden'}`}>
+                      {username}
+                    </div>
+                  <PopoverContent {... popoverProfileHandler} className='border-none z-[9999] bg-transparent shadow-none'>
+                    <div className="flex flex-col opacity-90 justify-center shadow-md p-4 rounded-xl bg-gray-900 w-[250px]">
+                      <Avatar src={getProfileImage(Role)} alt='profile' className="object-contain brightness-0 invert mx-auto" size='lg' />
                       <div className="space-y-2 text-center divide-y divide-gray-700">
                         <div className="my-1 space-y-1 break-all">
                           <h2 className=" font-semibold text-sm break-all">Guest</h2>
@@ -174,17 +195,17 @@ const Home = () =>  {
                         <div className="flex justify-center item-center content-center text-gray-400 pt-1 align-center">
                           <div className='tex-gray-400 text-xs pr-2'>
                             <FontAwesomeIcon icon={faEnvelope} />
-                            <h3 className='text-xs'>guest@gmail.com</h3>
+                            <h3 className='text-xs'>-</h3>
                           </div>
                           <div className='text-gray-400 text-xs pl-2'>
                             <FontAwesomeIcon icon={faUserShield} />
-                            <h3 className='text-xs'>Guest</h3>
+                            <h3 className='text-xs'>-</h3>
                           </div>
                         </div>
                       </div>
                     </div>
-                  )}
-                </div>
+                  </PopoverContent>
+                </Popover>
               </div>
             )}
 
@@ -204,24 +225,24 @@ const Home = () =>  {
               transition={Bounce}
             />
           </div>
-            {NotificationStatus ? (
-              <div className={`notification flex flex-col max-h-screen absolute top-16 right-1 gap-1 ${NotificationStatus ? 'slide-in' : 'slide-out'}`}>
-                <div class="flex items-center lg:w-[300px] md:w-[250px] sm:w-[200px] p-4 opacity-90 rounded-lg shadow bg-gray-900">
-                  {NotificationInfo === 'Error' ? (
-                    <div class="flex bg-red-500 items-center justify-center flex-shrink-0 w-8 h-8 text-white rounded-lg">
-                      <FontAwesomeIcon icon={faThumbsDown} />
-                    </div>
-                  ) : (
-                    <div class="flex bg-green-500 items-center justify-center flex-shrink-0 w-8 h-8 text-white rounded-lg">
-                      <FontAwesomeIcon icon={faThumbsUp} />
-                    </div>
-                  )}
-                  <div class="ml-3 text-left text-sm font-normal break-all text-white">{Notification}</div>
-                </div>
+          {NotificationStatus ? (
+            <div className={`notification flex flex-col max-h-screen absolute top-16 right-1 gap-1 ${NotificationStatus ? 'slide-in' : 'slide-out'}`}>
+              <div class="flex items-center lg:w-[300px] md:w-[250px] sm:w-[200px] p-4 opacity-90 rounded-lg shadow bg-gray-900">
+                {NotificationInfo === 'Error' ? (
+                  <div class="flex bg-red-500 items-center justify-center flex-shrink-0 w-8 h-8 text-white rounded-lg">
+                    <FontAwesomeIcon icon={faThumbsDown} />
+                  </div>
+                ) : (
+                  <div class="flex bg-green-500 items-center justify-center flex-shrink-0 w-8 h-8 text-white rounded-lg">
+                    <FontAwesomeIcon icon={faThumbsUp} />
+                  </div>
+                )}
+                <div class="ml-3 text-left text-sm font-normal break-all text-white">{Notification}</div>
               </div>
-            ) : null }
-          </div>
+            </div>
+          ) : null }
         </div>
+      </div>
       ) : null }
 
       {/* CONTAINER */}
@@ -229,7 +250,7 @@ const Home = () =>  {
       <div className='flex'>
         {isDesktopView && (
           <Card 
-            className={`h-screen text-white z-50 fixed mt-[60px] w-full bg-gray-800 rounded-none max-w-[296px] ${openSidebar ? 'sidebar-opened' : 'sidebar-closed'}`} 
+            className={`h-screen text-white z-[9999] fixed mt-[60px] w-full bg-gray-800 rounded-none max-w-[296px] ${openSidebar ? 'sidebar-opened' : 'sidebar-closed'}`} 
             id='sidebar' 
             style={{left: openSidebar ? '0' : '-296px', 
                     transition: 'left 0.5s ease-in-out',
@@ -292,7 +313,7 @@ const Home = () =>  {
                 <ListItem className="p-0 px-1 hover:bg-[#323b49] active:bg-gray-600 focus:bg-gray-800 bg-gray-800" selected={openSubmenu === 1}>
                   <AccordionHeader onClick={() => handleOpenSubmenu(1)} className="border-b-0 p-3 bg-none text-white hover:text-white">
                     <ListItemPrefix className='mr-3 w-6 h-6'>
-                      <FontAwesomeIcon icon={faComputer} />
+                      <FontAwesomeIcon icon={faComputer} size='sm' />
                     </ListItemPrefix>
                     <Typography color="white" className="mr-auto font-normal">
                       Assets
@@ -316,6 +337,36 @@ const Home = () =>  {
                             <FontAwesomeIcon icon={faPlus} />
                           </ListItemPrefix>
                           Add an Asset
+                        </ListItem>
+                      </Link>
+                    ) : null}
+                    {Role === 2 || Role === 1 ? (
+                      <Link to='/test'>
+                        <ListItem className='px-4 text-white hover:bg-[#374151] hover:text-white hover:rounded-none focus:rounded-none focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
+                          <ListItemPrefix className='mr-3 w-6 h-6'>
+                            <FontAwesomeIcon icon={faCameraRetro} />
+                          </ListItemPrefix>
+                          Scan TEST
+                        </ListItem>
+                      </Link>
+                    ) : null}
+                    {Role === 2 || Role === 1 ? (
+                      <Link to='/qrgen'>
+                        <ListItem className='px-4 text-white hover:bg-[#374151] hover:text-white hover:rounded-none focus:rounded-none focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
+                          <ListItemPrefix className='mr-3 w-6 h-6'>
+                            <FontAwesomeIcon icon={faCameraRetro} />
+                          </ListItemPrefix>
+                          Scan QRGEN
+                        </ListItem>
+                      </Link>
+                    ) : null}
+                     {Role === 2 || Role === 2 ? (
+                      <Link to='/dev'>
+                        <ListItem className='px-4 text-white hover:bg-[#374151] hover:text-white hover:rounded-none focus:rounded-none focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
+                          <ListItemPrefix className='mr-3 w-6 h-6'>
+                            <FontAwesomeIcon icon={faCameraRetro} />
+                          </ListItemPrefix>
+                          Dev
                         </ListItem>
                       </Link>
                     ) : null}
@@ -357,14 +408,14 @@ const Home = () =>  {
                 open={openSubmenu === 2}
                 icon={
                   <FontAwesomeIcon icon={faChevronDown} size=''
-                    className={`mx-auto items-center flex h-3 w-4 transition-transform ${openSubmenu === 1 ? "rotate-180" : ""}`}
+                    className={`mx-auto items-center flex h-3 w-4 transition-transform ${openSubmenu === 2 ? "rotate-180" : ""}`}
                   />
                 }
               >
                 <ListItem className="p-0 px-1 hover:bg-[#323b49] active:bg-gray-600 focus:bg-gray-800 bg-gray-800" selected={openSubmenu === 2}>
                   <AccordionHeader onClick={() => handleOpenSubmenu(2)} className="border-b-0 p-3 bg-none text-white hover:text-white">
                     <ListItemPrefix className='mr-3 w-6 h-6'>
-                      <FontAwesomeIcon icon={faBook} />
+                      <FontAwesomeIcon icon={faBook} size='sm' />
                     </ListItemPrefix>
                     <Typography color="white" className="mr-auto font-normal">
                       Reports
@@ -389,6 +440,48 @@ const Home = () =>  {
                           <FontAwesomeIcon icon={faFileLines} />
                         </ListItemPrefix>
                         My Report
+                      </ListItem>
+                    </Link>
+                  </List>
+                </AccordionBody>
+              </Accordion>
+              {/* MANAGE USER */}
+              <Accordion
+                open={openSubmenu === 3}
+                icon={
+                  <FontAwesomeIcon icon={faChevronDown}
+                    className={`mx-auto items-center flex h-3 w-4 transition-transform ${openSubmenu === 3 ? "rotate-180" : ""}`}
+                  />
+                }
+              >
+                <ListItem className="p-0 px-1 hover:bg-[#323b49] active:bg-gray-600 focus:bg-gray-800 bg-gray-800" selected={openSubmenu === 2}>
+                  <AccordionHeader onClick={() => handleOpenSubmenu(3)} className="border-b-0 p-3 bg-none text-white hover:text-white">
+                    <ListItemPrefix className='mr-3 w-6 h-6'>
+                      <FontAwesomeIcon icon={faUserGear} size='sm' />
+                    </ListItemPrefix>
+                    <Typography color="white" className="mr-auto font-normal">
+                      Manage User
+                    </Typography>
+                  </AccordionHeader>
+                </ListItem>
+                <AccordionBody className="p-0 bg-gray-600">
+                  <List className="p-0 gap-0">
+                    {Role === 2 || Role === 1 ? (
+                      <Link to='/listuser'>
+                        <ListItem className='px-4 text-white hover:bg-[#374151] hover:text-white hover:rounded-none focus:rounded-none focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
+                          <ListItemPrefix className='mr-3 w-6 h-6'>
+                            <FontAwesomeIcon icon={faUsers}/>
+                          </ListItemPrefix>
+                          List of User
+                        </ListItem>
+                      </Link>
+                    ) : null}
+                    <Link to='/adduser'>
+                      <ListItem className='px-4 text-white hover:bg-[#374151] hover:text-white hover:rounded-none focus:rounded-none focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
+                        <ListItemPrefix className='mr-3 w-6 h-6'>
+                          <FontAwesomeIcon icon={faUserPlus} />
+                        </ListItemPrefix>
+                        Add an User
                       </ListItem>
                     </Link>
                   </List>
@@ -422,11 +515,10 @@ const Home = () =>  {
           {!isDesktopView && (
           <Drawer 
           open={openDrawer} 
-          className='mt-[62px] w-full bg-gray-800' 
+          className='mt-[60px] z-[9999] w-full bg-gray-800' 
           onClose={handleOpenDrawer}
-          // overlay={false}
           overlayProps={{
-            className:' z-40 mt-[62px]'
+            className:'z-[9998] fixed mt-[60px]'
           }}
         >
             <div className="mb-8 p-8">
@@ -448,7 +540,7 @@ const Home = () =>  {
                   </button>
               </div>
             </div>
-            <List className='px-6'>
+            <List className='px-6 overflow-y-auto'>
               {/* DASHBOARD */}
               <Link to='/'>
                 <ListItem className='px-4 text-white hover:bg-[#323b49] hover:text-white focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
@@ -510,6 +602,26 @@ const Home = () =>  {
                             <FontAwesomeIcon icon={faPlus} />
                           </ListItemPrefix>
                           Add an Asset
+                        </ListItem>
+                      </Link>
+                    ) : null}
+                    {Role === 2 || Role === 1 ? (
+                      <Link to='/test'>
+                        <ListItem className='px-4 text-white hover:bg-[#374151] hover:text-white hover:rounded-none focus:rounded-none focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
+                          <ListItemPrefix className='mr-3 w-6 h-6'>
+                            <FontAwesomeIcon icon={faCameraRetro} />
+                          </ListItemPrefix>
+                          Scan TEST
+                        </ListItem>
+                      </Link>
+                    ) : null}
+                    {Role === 2 || Role === 1 ? (
+                      <Link to='/qrgen'>
+                        <ListItem className='px-4 text-white hover:bg-[#374151] hover:text-white hover:rounded-none focus:rounded-none focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
+                          <ListItemPrefix className='mr-3 w-6 h-6'>
+                            <FontAwesomeIcon icon={faCameraRetro} />
+                          </ListItemPrefix>
+                          Scan QRGEN
                         </ListItem>
                       </Link>
                     ) : null}
@@ -589,18 +701,60 @@ const Home = () =>  {
                 </AccordionBody>
               </Accordion>
               {/* MANAGE USER */}
-              {Role === 2 || Role === 1 ? (
-              <Link to='/manageuser'>
-                <ListItem className='px-4 text-white hover:bg-[#323b49] hover:text-white focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
-                  <ListItemPrefix className='mr-3 w-6 h-6'>
-                    <FontAwesomeIcon icon={faUserGear}/>
-                  </ListItemPrefix>
-                  <Typography>
-                    Manage User
-                  </Typography>
+              <Accordion
+                open={openSubmenu === 3}
+                icon={
+                  <FontAwesomeIcon icon={faChevronDown}
+                    className={`mx-auto items-center flex h-3 w-4 transition-transform ${openSubmenu === 3 ? "rotate-180" : ""}`}
+                  />
+                }
+              >
+                <ListItem className="p-0 px-1 hover:bg-[#323b49] active:bg-gray-600 focus:bg-gray-800 bg-gray-800" selected={openSubmenu === 2}>
+                  <AccordionHeader onClick={() => handleOpenSubmenu(3)} className="border-b-0 p-3 bg-none text-white hover:text-white">
+                    <ListItemPrefix className='mr-3 w-6 h-6'>
+                      <FontAwesomeIcon icon={faUserGear} size='sm' />
+                    </ListItemPrefix>
+                    <Typography color="white" className="mr-auto font-normal">
+                      Manage User
+                    </Typography>
+                  </AccordionHeader>
                 </ListItem>
-              </Link>
-              ) : null}
+                <AccordionBody className="p-0 bg-gray-600">
+                  <List className="p-0 gap-0">
+                    {Role === 2 || Role === 1 ? (
+                      <Link to='/listuser'>
+                        <ListItem className='px-4 text-white hover:bg-[#374151] hover:text-white hover:rounded-none focus:rounded-none focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
+                          <ListItemPrefix className='mr-3 w-6 h-6'>
+                            <FontAwesomeIcon icon={faUsers}/>
+                          </ListItemPrefix>
+                          List of User
+                        </ListItem>
+                      </Link>
+                    ) : null}
+                    <Link to='/adduser'>
+                      <ListItem className='px-4 text-white hover:bg-[#374151] hover:text-white hover:rounded-none focus:rounded-none focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
+                        <ListItemPrefix className='mr-3 w-6 h-6'>
+                          <FontAwesomeIcon icon={faUserPlus} />
+                        </ListItemPrefix>
+                        Add an User
+                      </ListItem>
+                    </Link>
+                  </List>
+                </AccordionBody>
+              </Accordion>
+              {/* MANAGE USER */}
+              {Role === 2 && (
+                <Link to='manageuser'>
+                  <ListItem className='px-4 text-white hover:bg-[#323b49] hover:text-white focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
+                    <ListItemPrefix className='mr-3 w-6 h-6'>
+                      <FontAwesomeIcon icon={faUserGear}/>
+                    </ListItemPrefix>
+                    <Typography>
+                      Manage User
+                    </Typography>
+                  </ListItem>
+                </Link>
+              )}
               {loggedIn && (
                 <Link to='/Login'>
                   <ListItem onClick={logout} className=' py-2 mt-4 flex justify-center items-center text-sm text-white bg-gray-600 hover:text-white hover:bg-[#323b49] focus:text-white focus:bg-gray-600 active:bg-gray-600 active:text-white'>
@@ -655,10 +809,15 @@ const Home = () =>  {
             />  
             <Route path="/myreport" element={<MyReport />} />
             <Route path="*" element={<Notfound />} />
-            <Route path="/test" element={<Test />} />
+            <Route path="/qradd" element={<QrAdd />} />
             <Route path="/qrgen" element={<Qrgen />} />
             <Route path="/offline" element={<Offline />} />
-          </Routes>
+            <Route path="/dev" element={<Development />} />
+            <Route path="/coba" element ={<Coba />}  />
+            <Route path="/adduser" element ={<AddUser />}  />
+            <Route path="/listuser" element ={<ListUser />}  />
+            <Route path="/verify/:token" element ={<Verify />}  />
+            </Routes>
         </div>
       </div>
     ) : <Login /> }

@@ -1,7 +1,9 @@
 from app.config_db import get_db_connection
+from app.config_flask import check_whitelist
 from flask_restful import Resource
 
 class HistoryTicket(Resource):
+    @check_whitelist
     def get(self):
         db, lmd = get_db_connection()
         
@@ -11,7 +13,7 @@ class HistoryTicket(Resource):
         
         ticket_list = []
         for row, ticket_data in enumerate(tickets, start=1):
-            idticket, idasset, name, leasedate, returndate, location, email, note, status = ticket_data
+            idticket, idasset, name, leasedate, returndate, location, email, note, status, deleted = ticket_data
             
             # Get email addresses of admins for this ticket
             lmd.execute('SELECT email from ticketingadmin where idticket = %s', (idticket,))
@@ -68,6 +70,7 @@ class HistoryTicket(Resource):
 
 
 class HistoryLoanData(Resource):
+    @check_whitelist
     def get(self):
         db, lmd = get_db_connection()
         

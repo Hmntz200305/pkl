@@ -4,13 +4,14 @@ import {  faFileCsv, faPenToSquare, faTrash, faFilePdf } from '@fortawesome/free
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAuth } from '../AuthContext';
 import { useDropzone } from 'react-dropzone';
-// 
 import { MaterialReactTable, createMRTColumnHelper, useMaterialReactTable, } from 'material-react-table';
 import { mkConfig, generateCsv, download } from 'export-to-csv';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import Modal from 'react-modal';
 import { Tabs, TabsHeader, TabsBody, Tab, TabPanel, } from "@material-tailwind/react";
+import { Input, Menu, MenuList, MenuItem, MenuHandler, Button } from "@material-tailwind/react";
+
 Modal.setAppElement('#root');
 
 const ListAsset = () => {
@@ -157,7 +158,7 @@ const ListAsset = () => {
       formData.append('csvFile', selectedFile);
     
       try {
-        const response = await fetch('/api/importcsv', {
+        const response = await fetch('https://sipanda.online:8443/api/importcsv', {
           method: 'POST',
           body: formData,
         });
@@ -224,34 +225,79 @@ const ListAsset = () => {
     )
   }
 
-  const { token, Role, DataListAsset, refreshAssetData, refreshStatusList, StatusOptions, LocationOptions, refreshLocationList, refreshCategoryList, CategoryOptions, setNotification, setNotificationInfo, setNotificationStatus } = useAuth();
+  const { token, Role, DataListAsset, refreshAssetData, refreshStatusList, StatusOptions, LocationOptions, refreshLocationList, refreshCategoryList, CategoryOptions, setNotification, setNotificationInfo, setNotificationStatus, openSidebar, setOpenSidebar } = useAuth();
   const [showEdit, setShowEdit] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
   const [selectedAssetId, setSelectedAssetId] = useState(null);
   const [selectedAsset, setSelectedAsset] = useState(null);
   const [fileInput, setFileInput] = useState(null);
-  const tableRef = useRef(null)
+  const tableRef = useRef(null);
+  const [inputValueStatus, setInputValueStatus] = useState('');
+  const [inputValueLocation, setInputValueLocation] = useState('');
+  const [inputValueCategory, setInputValueCategory] = useState('');
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const isMobile = windowWidth <= 768;
+  const [isDesktopView, setIsDesktopView] = useState(window.innerWidth > 768);
+  const [modalEdit, setModalEdit] = useState(false);
+  const [modalDelete, setModalDelete] = useState(false);
 
-  const showEditHandler = (row) => {
+  const handleResizeMobile = () => {
+      setIsDesktopView(window.innerWidth > 768);
+  }; 
+  
+  const handleResizeApp = () => {
+    if (window.innerWidth <= 768) {
+      setOpenSidebar(false);
+    } else {
+      setOpenSidebar(true);
+    }
+  };
+  
+  useEffect(() => {
+      window.addEventListener('resize', handleResizeMobile);
+
+      return () => {
+      window.removeEventListener('resize', handleResizeMobile);
+      };
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener('resize', handleResizeApp);
+    return () => {
+      window.removeEventListener('resize', handleResizeApp);
+    };
+  }, []);
+
+  const openModalEdit = (row) => {
+    setModalEdit(true);
     setSelectedAsset(row);
-    setShowEdit(true);
-    setShowDelete(false);
-  };
-
-  const hideEditHandler = () => {
+  }
+  const closeModalEdit = () => {
+    setModalEdit(false);
     setSelectedAsset(null);
-    setShowEdit(false);
+  }
+
+  const openModalDelete = (no) => {
+    setModalDelete(true);
+    setSelectedAssetId(no)
+  }
+  const closeModalDelete = () => {
+    setModalDelete(false);
+  }
+
+  const handleOptionSelectStatus = (option) => {
+    setInputValueStatus(option); // Menetapkan nilai pada input
+    setSelectedAsset((prevAsset) => ({ ...prevAsset, status: option })); // Menetapkan nilai pada selectedAsset
+  };
+  const handleOptionSelectLocation = (option) => {
+    setInputValueLocation(option);
+    setSelectedAsset((prevAsset) => ({ ...prevAsset, location: option }));
+  };
+  const handleOptionSelectCategory = (option) => {
+    setInputValueCategory(option);
+    setSelectedAsset((prevAsset) => ({ ...prevAsset, category: option }));
   };
 
-  const showDeleteHandler = (no) => {
-    setSelectedAssetId(no);
-    setShowEdit(false);
-    setShowDelete(true);
-  };
-
-  const hideDeleteHandler = () => {
-    setShowDelete(false);
-  };
   
   useEffect(() => {
     refreshAssetData();
@@ -293,7 +339,7 @@ const ListAsset = () => {
     }
 
     try {
-      const response = await fetch(`http://103.148.77.238/api/edit-asset/${selectedAsset.no}`, {
+      const response = await fetch(`https://sipanda.online:8443/api/edit-asset/${selectedAsset.no}`, {
         method: 'PUT',
         headers: {
           Authorization: token,
@@ -305,7 +351,7 @@ const ListAsset = () => {
         const data = await response.json();
         setNotification(data.message);
         setNotificationStatus(true);
-        setShowEdit(false);
+        setModalEdit(false);
         refreshAssetData();
       } else {
         const data = await response.json();
@@ -331,7 +377,7 @@ const ListAsset = () => {
         const data = await response.json();
         setNotification(data.message);
         setNotificationStatus(true);
-        setShowDelete(false);
+        setModalDelete(false);
         refreshAssetData();
       } else {
         const data = await response.json();
@@ -417,10 +463,10 @@ const ListAsset = () => {
       Cell: ({row}) => (
         Role === 2 ? (
           <div className='text-white'>
-            <button className='bg-green-500 p-2 rounded-lg hover:bg-green-700 m-0.5' onClick={() => showEditHandler(row.original)}>
+            <button className='bg-green-500 p-2 rounded-lg hover:bg-green-700 m-0.5' onClick={() => openModalEdit(row.original)}>
               <FontAwesomeIcon icon={faPenToSquare} />
             </button>
-            <button className='bg-red-500 p-2 rounded-lg hover:bg-red-700 m-0.5' onClick={() => showDeleteHandler(row.original.no)}>
+            <button className='bg-red-500 p-2 rounded-lg hover:bg-red-700 m-0.5' onClick={() => openModalDelete(row.original.no)}>
               <FontAwesomeIcon icon={faTrash} />
             </button>
           </div>
@@ -470,167 +516,429 @@ const ListAsset = () => {
             </Tabs>
         </div>
       </div>
+      
+      {isDesktopView && (
+        <Modal
+          isOpen={modalEdit}
+          onRequestClose={closeModalEdit}
+          contentLabel="Contoh Modal"
+          overlayClassName="fixed inset-0 z-50 bg-gray-500 bg-opacity-75 flex items-center justify-center"
+          className={`modal-content bg-transparent p-4 w-screen ${openSidebar ? ' pl-[315px]' : ''}`}
+          shouldCloseOnOverlayClick={false}
+        >
+          <div className='p-2'>
+            <div className='bg-white rounded-2xl shadow p-4 space-y-4'>
+              <div className='flex p-4 items-baseline max-w-fit rounded-2xl'>
+                <h2 className='text-black text-2xl'>Add Asset Form
+                  <span className='text-black text-sm ml-2'>Input Asset data below:</span>
+                </h2>
+              </div>
+              <div className='flex items-center gap-4'>
+                <label className={`pr-4 w-32 text-right ${isMobile ? 'hidden lg:inline' : ''}`}>ID</label>
+                <Input 
+                  variant="outline"
+                  label="Input Asset ID"
+                  value={selectedAsset?.id}
+                  onChange={(e) => setSelectedAsset({ ...selectedAsset, id: e.target.value })}
+                />
+              </div>
+              <div className='flex items-center gap-4'>
+                <label className={`pr-4 w-32 text-right ${isMobile ? 'hidden lg:inline' : ''}`}>Name</label>
+                <Input
+                  variant="outline"
+                  label="Input Asset Name"
+                  value={selectedAsset?.name}
+                  onChange={(e) => setSelectedAsset({ ...selectedAsset, name: e.target.value })}
+                />
+              </div>
+              <div className='flex items-center gap-4'>
+                <label className={`pr-4 w-32 text-right ${isMobile ? 'hidden lg:inline' : ''}`}>Description</label>
+                <Input 
+                  variant="outline" 
+                  label="Input Asset Description"
+                  value={selectedAsset?.description}
+                  onChange={(e) => setSelectedAsset({ ...selectedAsset, description: e.target.value })}
+                />
+              </div>
+              <div className='flex items-center gap-4'>
+                <label className={`pr-4 w-32 text-right ${isMobile ? 'hidden lg:inline' : ''}`}>Brand</label>
+                <Input 
+                  variant="outline" 
+                  label="Input Asset Brand" 
+                  value={selectedAsset?.brand}
+                  onChange={(e) => setSelectedAsset({ ...selectedAsset, brand: e.target.value })}
+                />
+              </div>
+              <div className='flex items-center gap-4'>
+                <label className={`pr-4 w-32 text-right ${isMobile ? 'hidden lg:inline' : ''}`}>Model</label>
+                <Input 
+                  variant="outline" 
+                  label="Input Asset Model"
+                  value={selectedAsset?.model}
+                  onChange={(e) => setSelectedAsset({ ...selectedAsset, model: e.target.value })}
+                />
+              </div>
 
-      {showEdit && (
-        <div className='p-2'>
-            <div className='p-2 rounded-xl bg-white shadow-xl'> 
-                <div className='form-group'>
-                    <label className='label-text'>Asset ID</label>
-                    <input 
-                    className='form-input' 
-                    placeholder='Masukan Asset ID' 
-                    value={selectedAsset?.id}
-                    onChange={(e) => setSelectedAsset({ ...selectedAsset, id: e.target.value })}
-                    />
+              <div className='flex items-center gap-4'>
+                <label className={`pr-4 w-32 text-right ${isMobile ? 'hidden lg:inline' : ''}`}>Status</label>
+                <div className='flex items-center w-full relative '>
+                  <Menu placement="bottom-start">
+                    <MenuHandler>
+                      <Button
+                        ripple={false}
+                        variant="text"
+                        color="blue-gray"
+                        className="border border-blue-gray-200 px-4 rounded-r-none"
+                      >
+                        Select
+                      </Button>
+                    </MenuHandler>
+                    <MenuList className="max-w-[18rem]">
+                      {StatusOptions.map((status) => (
+                        <MenuItem key={status.id} value={status.status} onClick={() => handleOptionSelectStatus(status.status)}>
+                          {status.status}
+                        </MenuItem>
+                      ))}
+                    </MenuList>
+                  </Menu>
+                  <Input 
+                    className='w-full rounded-l-none'
+                    type="text"
+                    value={selectedAsset?.status}
+                    onChange={(e) => setInputValueStatus(e.target.value)}
+                    disabled
+                    required
+                    label='Input Asset Status'
+                  />
                 </div>
-                <div className='form-group'>
-                    <label className='label-text'>Asset Name</label>
-                    <input 
-                    className='form-input' 
-                    placeholder='Masukan Asset Name' 
-                    value={selectedAsset?.name}
-                    onChange={(e) => setSelectedAsset({ ...selectedAsset, name: e.target.value })}
-                    />
-                </div>
-                <div className='form-group'>
-                    <label className='label-text'>Description</label>
-                    <input 
-                    className='form-input' 
-                    placeholder='Masukan Asset Deskripsi' 
-                    value={selectedAsset?.description}
-                    onChange={(e) => setSelectedAsset({ ...selectedAsset, description: e.target.value })}
-                    />
-                </div>
-                <div className='form-group'>
-                    <label className='label-text'>Brand</label>
-                    <input 
-                    className='form-input' 
-                    placeholder='Masukan Asset Brand' 
-                    value={selectedAsset?.brand}
-                    onChange={(e) => setSelectedAsset({ ...selectedAsset, brand: e.target.value })}
-                    />
-                </div>
-                <div className='form-group'>
-                    <label className='label-text'>Model</label>
-                    <input 
-                    className='form-input' 
-                    placeholder='Masukan Model Asset' 
-                    value={selectedAsset?.model}
-                    onChange={(e) => setSelectedAsset({ ...selectedAsset, model: e.target.value })}
-                    />
-                </div>
-                <div class="form-group">
-                    <label class="label-text">Status</label>
-                    <div class="kategori-container">
-                        <div class="dropdown-container">
-                            <select 
-                            class="category-dropdown" 
-                            id="statusDropdown" 
-                            name="status" 
-                            value={selectedAsset?.status}
-                            onChange={(e) => setSelectedAsset({ ...selectedAsset, status: e.target.value })}
-                            required
-                            >
-                                <option value="" disabled selected>Pilih Status</option>
-                                {StatusOptions.map((status) => (
-                                    <option key={status.id} value={status.status}>
-                                      {status.status}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="label-text">Location</label>
-                    <div class="kategori-container">
-                        <div class="dropdown-container">
-                            <select 
-                            class="category-dropdown" 
-                            id="statusDropdown" 
-                            name="status"
-                            value={selectedAsset?.location}
-                            onChange={(e) => setSelectedAsset({ ...selectedAsset, location: e.target.value })} 
-                            required
-                            >
-                                <option value="" disabled selected>Pilih Lokasi</option>
-                                {LocationOptions.map((location) => (
-                                    <option key={location.id} value={location.location}>
-                                      {location.location}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="label-text">kategori</label>
-                    <div class="kategori-container">
-                        <div class="dropdown-container">
-                            <select 
-                            class="category-dropdown" 
-                            id="statusDropdown" 
-                            name="status" 
-                            value={selectedAsset?.category}
-                            onChange={(e) => setSelectedAsset({ ...selectedAsset, category: e.target.value })} 
-                            required
-                            >
-                                <option value="" disabled selected>Pilih Kategori</option>
-                                {CategoryOptions.map((category) => (
-                                    <option key={category.id} value={category.category}>
-                                      {category.category}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div className='form-group'>
-                    <label className='label-text'>Serial Number</label>
-                    <input 
-                    className='form-input' 
-                    placeholder='Masukan Serial Number' 
-                    value={selectedAsset?.sn}
-                    onChange={(e) => setSelectedAsset({ ...selectedAsset, sn: e.target.value })}
-                    />
-                </div>
-                <div className='form-group'>
-                    <label for="photo_asset" class="label-text">Photo</label>
-                    <input type="file" class="form-input" id="photo_asset" name="photo" accept="image/*" onChange={handleImageChange}/>
-                </div>
-                <div className='flex justify-end gap-1'>
-                    <button type="button" className='main-btn' id="edit-button" onClick={hideEditHandler}>Cancel</button>
-                    <button
-                      type="button"
-                      className="main-btn"
-                      id="edit-button"
-                      onClick={() => editAsset(token)}
-                    >
-                        Edit Asset
-                    </button>
+              </div>
 
+              <div className='flex items-center gap-4'>
+                <label className={`pr-4 w-32 text-right ${isMobile ? 'hidden lg:inline' : ''}`}>Location</label>
+                <div className='flex items-center w-full relative'>
+                  <Menu placement="bottom-start">
+                    <MenuHandler>
+                      <Button
+                        ripple={false}
+                        variant="text"
+                        color="blue-gray"
+                        className="border border-blue-gray-200 px-4 rounded-r-none"
+                      >
+                        Select
+                      </Button>
+                    </MenuHandler>
+                    <MenuList className="max-w-[18rem]">
+                      {LocationOptions.map((location) => (
+                        <MenuItem value={location.location} key={location.id} onClick={() => handleOptionSelectLocation(location.location)}>
+                          {location.location}
+                        </MenuItem>
+                      ))}
+                    </MenuList>
+                  </Menu>
+                  <Input
+                    className='w-full rounded-l-none'
+                    type="text"
+                    value={selectedAsset?.location}
+                    onChange={(e) => setInputValueLocation(e.target.value)}
+                    disabled
+                    required
+                    label='Input Asset Location'
+                  />
                 </div>
-            </div>
-        </div>
-      )}
-
-      {showDelete && (
-        <div className='p-2'>
-          <div className="flex flex-col items-center justify-center bg-white p-2 shadow-xl rounded-2xl">
-            <div className='flex flex-col text-center mb-2'>
-              <h1 className="text-2xl font-semibold">Select Action</h1>
-              <p>Apakah anda yakin ingin menghapus Asset ini?</p>
-            </div>
-            <div className="flex space-x-4 mt-5">
-              <button className="main-btn hover-bg-slate-600 text-white font-semibold py-2 px-4 rounded" onClick={hideDeleteHandler}>
-                Cancel
-              </button>
-              <button className="main-btn hover-bg-slate-600 text-white font-semibold py-2 px-4 rounded" onClick={() => deleteAsset(selectedAssetId)}>
-                Delete
-              </button>
+              </div>
+              <div className='flex items-center gap-4'>
+                <label className={`pr-4 w-32 text-right ${isMobile ? 'hidden lg:inline' : ''}`}>Category</label>
+                <div className='flex items-center w-full relative'>
+                  <Menu placement="bottom-start">
+                    <MenuHandler>
+                      <Button
+                        ripple={false}
+                        variant="text"
+                        color="blue-gray"
+                        className="border border-blue-gray-200 px-4 rounded-r-none"
+                      >
+                        Select
+                      </Button>
+                    </MenuHandler>
+                    <MenuList className="max-w-[18rem]">
+                      {CategoryOptions.map((category) => (
+                        <MenuItem value={category.category} key={category.id} onClick={() => handleOptionSelectCategory(category.category)}>
+                          {category.category}
+                        </MenuItem>
+                      ))}
+                    </MenuList>
+                  </Menu>
+                  <Input
+                    className='w-full rounded-l-none'
+                    type="text"
+                    value={selectedAsset?.category}
+                    onChange={(e) => setInputValueCategory(e.target.value)}
+                    disabled
+                    required
+                    label='Input Asset Category'
+                  />
+                </div>
+              </div>
+              <div className='flex items-center gap-4'>
+                <label className={`pr-4 w-32 text-right ${isMobile ? 'hidden lg:inline' : ''}`}>Serial Number</label>
+                <Input 
+                  variant="outline" 
+                  label="Input Asset Serial Number"
+                  value={selectedAsset?.sn}
+                  onChange={(e) => setSelectedAsset({ ...selectedAsset, sn: e.target.value })}
+                />
+              </div>
+              <div className='flex items-center gap-4'>
+                <label className={`pr-4 w-32 text-right ${isMobile ? 'hidden lg:inline' : ''}`}>Photo</label>
+                <Input type='file' accept='image/*' variant="outline" label="Input Asset Photo" name='photo' onChange={handleImageChange} />
+              </div>
+              <div className='flex gap-1 justify-end'>
+                <button type="button" className='main-btn' id="edit-button" onClick={closeModalEdit}>Cancel</button>
+                <button type="button" className='main-btn' id="edit-button" onClick={() => editAsset(token)}>Edit Asset</button>
+              </div>
             </div>
           </div>
-        </div>
+        </Modal>
+      )}
+
+      {!isDesktopView && (
+        <Modal
+          isOpen={modalEdit}
+          onRequestClose={closeModalEdit}
+          contentLabel="Contoh Modal"
+          overlayClassName="fixed inset-0 z-50 bg-gray-500 bg-opacity-75 flex items-center justify-center"
+          className='modal-content bg-transparent p-4 w-screen'
+          shouldCloseOnOverlayClick={false}
+        >
+          <div className='p-2'>
+            <div className='bg-white rounded-2xl shadow p-4 space-y-4'>
+              <div className='flex p-4 items-baseline max-w-fit rounded-2xl'>
+                <h2 className='text-black text-2xl'>Add Asset Form
+                  <span className='text-black text-sm ml-2'>Input Asset data below:</span>
+                </h2>
+              </div>
+              <div className='flex items-center gap-4'>
+                <label className={`pr-4 w-32 text-right ${isMobile ? 'hidden lg:inline' : ''}`}>ID</label>
+                <Input 
+                  variant="outline"
+                  label="Input Asset ID"
+                  value={selectedAsset?.id}
+                  onChange={(e) => setSelectedAsset({ ...selectedAsset, id: e.target.value })}
+                />
+              </div>
+              <div className='flex items-center gap-4'>
+                <label className={`pr-4 w-32 text-right ${isMobile ? 'hidden lg:inline' : ''}`}>Name</label>
+                <Input
+                  variant="outline"
+                  label="Input Asset Name"
+                  value={selectedAsset?.name}
+                  onChange={(e) => setSelectedAsset({ ...selectedAsset, name: e.target.value })}
+                />
+              </div>
+              <div className='flex items-center gap-4'>
+                <label className={`pr-4 w-32 text-right ${isMobile ? 'hidden lg:inline' : ''}`}>Description</label>
+                <Input 
+                  variant="outline" 
+                  label="Input Asset Description"
+                  value={selectedAsset?.description}
+                  onChange={(e) => setSelectedAsset({ ...selectedAsset, description: e.target.value })}
+                />
+              </div>
+              <div className='flex items-center gap-4'>
+                <label className={`pr-4 w-32 text-right ${isMobile ? 'hidden lg:inline' : ''}`}>Brand</label>
+                <Input 
+                  variant="outline" 
+                  label="Input Asset Brand" 
+                  value={selectedAsset?.brand}
+                  onChange={(e) => setSelectedAsset({ ...selectedAsset, brand: e.target.value })}
+                />
+              </div>
+              <div className='flex items-center gap-4'>
+                <label className={`pr-4 w-32 text-right ${isMobile ? 'hidden lg:inline' : ''}`}>Model</label>
+                <Input 
+                  variant="outline" 
+                  label="Input Asset Model"
+                  value={selectedAsset?.model}
+                  onChange={(e) => setSelectedAsset({ ...selectedAsset, model: e.target.value })}
+                />
+              </div>
+
+              <div className='flex items-center gap-4'>
+                <label className={`pr-4 w-32 text-right ${isMobile ? 'hidden lg:inline' : ''}`}>Status</label>
+                <div className='flex items-center w-full relative '>
+                  <Menu placement="bottom-start">
+                    <MenuHandler>
+                      <Button
+                        ripple={false}
+                        variant="text"
+                        color="blue-gray"
+                        className="border border-blue-gray-200 px-4 rounded-r-none"
+                      >
+                        Select
+                      </Button>
+                    </MenuHandler>
+                    <MenuList className="max-w-[18rem]">
+                      {StatusOptions.map((status) => (
+                        <MenuItem key={status.id} value={status.status} onClick={() => handleOptionSelectStatus(status.status)}>
+                          {status.status}
+                        </MenuItem>
+                      ))}
+                    </MenuList>
+                  </Menu>
+                  <Input 
+                    className='w-full rounded-l-none'
+                    type="text"
+                    value={selectedAsset?.status}
+                    onChange={(e) => setInputValueStatus(e.target.value)}
+                    disabled
+                    required
+                    label='Input Asset Status'
+                  />
+                </div>
+              </div>
+
+              <div className='flex items-center gap-4'>
+                <label className={`pr-4 w-32 text-right ${isMobile ? 'hidden lg:inline' : ''}`}>Location</label>
+                <div className='flex items-center w-full relative'>
+                  <Menu placement="bottom-start">
+                    <MenuHandler>
+                      <Button
+                        ripple={false}
+                        variant="text"
+                        color="blue-gray"
+                        className="border border-blue-gray-200 px-4 rounded-r-none"
+                      >
+                        Select
+                      </Button>
+                    </MenuHandler>
+                    <MenuList className="max-w-[18rem]">
+                      {LocationOptions.map((location) => (
+                        <MenuItem value={location.location} key={location.id} onClick={() => handleOptionSelectLocation(location.location)}>
+                          {location.location}
+                        </MenuItem>
+                      ))}
+                    </MenuList>
+                  </Menu>
+                  <Input
+                    className='w-full rounded-l-none'
+                    type="text"
+                    value={selectedAsset?.location}
+                    onChange={(e) => setInputValueLocation(e.target.value)}
+                    disabled
+                    required
+                    label='Input Asset Location'
+                  />
+                </div>
+              </div>
+              <div className='flex items-center gap-4'>
+                <label className={`pr-4 w-32 text-right ${isMobile ? 'hidden lg:inline' : ''}`}>Category</label>
+                <div className='flex items-center w-full relative'>
+                  <Menu placement="bottom-start">
+                    <MenuHandler>
+                      <Button
+                        ripple={false}
+                        variant="text"
+                        color="blue-gray"
+                        className="border border-blue-gray-200 px-4 rounded-r-none"
+                      >
+                        Select
+                      </Button>
+                    </MenuHandler>
+                    <MenuList className="max-w-[18rem]">
+                      {CategoryOptions.map((category) => (
+                        <MenuItem value={category.category} key={category.id} onClick={() => handleOptionSelectCategory(category.category)}>
+                          {category.category}
+                        </MenuItem>
+                      ))}
+                    </MenuList>
+                  </Menu>
+                  <Input
+                    className='w-full rounded-l-none'
+                    type="text"
+                    value={selectedAsset?.category}
+                    onChange={(e) => setInputValueCategory(e.target.value)}
+                    disabled
+                    required
+                    label='Input Asset Category'
+                  />
+                </div>
+              </div>
+              <div className='flex items-center gap-4'>
+                <label className={`pr-4 w-32 text-right ${isMobile ? 'hidden lg:inline' : ''}`}>Serial Number</label>
+                <Input 
+                  variant="outline" 
+                  label="Input Asset Serial Number"
+                  value={selectedAsset?.sn}
+                  onChange={(e) => setSelectedAsset({ ...selectedAsset, sn: e.target.value })}
+                />
+              </div>
+              <div className='flex items-center gap-4'>
+                <label className={`pr-4 w-32 text-right ${isMobile ? 'hidden lg:inline' : ''}`}>Photo</label>
+                <Input type='file' accept='image/*' variant="outline" label="Input Asset Photo" name='photo' onChange={handleImageChange} />
+              </div>
+              <div className='flex gap-1 justify-end'>
+                <button type="button" className='main-btn' id="edit-button" onClick={closeModalEdit}>Cancel</button>
+                <button type="button" className='main-btn' id="edit-button" onClick={() => editAsset(token)}>Edit Asset</button>
+              </div>
+            </div>
+          </div>
+        </Modal>
+      )}
+      
+      {isDesktopView && (
+        <Modal 
+          isOpen={modalDelete}
+          onRequestClose={closeModalDelete}
+          contentLabel="Contoh Modal"
+          overlayClassName="fixed inset-0 z-50 bg-gray-500 bg-opacity-75 flex items-center justify-center"
+          className={`modal-content bg-transparent p-4 w-screen ${openSidebar ? ' pl-[315px]' : ''}`}
+          shouldCloseOnOverlayClick={false}
+        >
+          <div className='p-2'>
+            <div className="flex flex-col items-center justify-center bg-white p-2 shadow-xl rounded-2xl">
+              <div className='flex flex-col text-center mb-2'>
+                <h1 className="text-2xl font-semibold">Select Action</h1>
+                <p>Apakah anda yakin ingin menghapus Asset ini?</p>
+              </div>
+              <div className="flex space-x-4 mt-5">
+                <button className="main-btn" onClick={closeModalDelete}>
+                  Cancel
+                </button>
+                <button className="main-btn" onClick={() => deleteAsset(selectedAssetId)}>
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {!isDesktopView && (
+        <Modal 
+          isOpen={modalDelete}
+          onRequestClose={closeModalDelete}
+          contentLabel="Contoh Modal"
+          overlayClassName="fixed inset-0 z-50 bg-gray-500 bg-opacity-75 flex items-center justify-center"
+          className='modal-content bg-transparent p-4 w-screen'
+          shouldCloseOnOverlayClick={false}
+        >
+          <div className='p-2'>
+            <div className="flex flex-col items-center justify-center bg-white p-2 shadow-xl rounded-2xl">
+              <div className='flex flex-col text-center mb-2'>
+                <h1 className="text-2xl font-semibold">Select Action</h1>
+                <p>Apakah anda yakin ingin menghapus Asset ini?</p>
+              </div>
+              <div className="flex space-x-4 mt-5">
+                <button className="main-btn" onClick={closeModalDelete}>
+                  Cancel
+                </button>
+                <button className="main-btn" onClick={() => deleteAsset(selectedAssetId)}>
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </Modal>
       )}
 
       <div className='p-2'>
@@ -655,3 +963,4 @@ const ListAsset = () => {
 };
 
 export default ListAsset;
+  

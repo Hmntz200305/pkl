@@ -1,5 +1,5 @@
 from flask import jsonify, request
-from app.config_flask import SECRET_KEY
+from app.config_flask import SECRET_KEY, check_whitelist
 from app.config_db import get_db_connection
 from flask_restful import Resource, reqparse
 import hashlib
@@ -24,6 +24,7 @@ def validate_login(email, password):
     return True
 
 class Login(Resource):
+    @check_whitelist
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('email', type=str, required=True)
@@ -67,6 +68,7 @@ class Login(Resource):
 
 
 class Authentication(Resource):
+    @check_whitelist
     def post(self):
         db, lmd = get_db_connection()
 
@@ -97,6 +99,7 @@ class Authentication(Resource):
             return{"message": "Invalid Token"}
         
 class AdminList(Resource):
+    @check_whitelist
     def get(self):
         db, lmd = get_db_connection()
         lmd.execute('SELECT username,email from users where role IN (1,2)')

@@ -2,7 +2,7 @@ from app.config_db import get_db_connection
 from flask_restful import Resource
 from werkzeug.utils import secure_filename
 from flask import jsonify, request, current_app
-from app.config_flask import SECRET_KEY
+from app.config_flask import SECRET_KEY, check_whitelist
 import shutil
 import json
 import jwt
@@ -10,6 +10,7 @@ import os
 
 
 class ListAsset(Resource):
+    @check_whitelist
     def get(self):
         db, lmd = get_db_connection()
         lmd.execute("SELECT * FROM assets")
@@ -48,6 +49,7 @@ def validate_editasset(ids, name, description, brand, model, status, location, c
     return True
     
 class EditAsset(Resource):
+    @check_whitelist
     def put(self, idasset):
         db, lmd = get_db_connection()
 
@@ -89,7 +91,7 @@ class EditAsset(Resource):
                             save_path = os.path.join(current_app.config['UPLOAD_FOLDER'], ids)
                             os.makedirs(save_path, exist_ok=True)
                             file.save(os.path.join(save_path, filename))
-                            image_path = ('http://sipanda.online:5000/static/upload/' + ids + '/' + filename)
+                            image_path = ('https://sipanda.online:8443/static/upload/' + ids + '/' + filename)
                             lmd.execute("UPDATE assets set asset = %s, name = %s, description = %s, brand = %s, model = %s, status = %s, location = %s, category = %s, serialnumber = %s, photo = %s where id = %s", (ids, name, description, brand, model, status, location, category, sn, image_path, idasset))
                             db.commit()
                             lmd.close()
@@ -106,6 +108,7 @@ class EditAsset(Resource):
                     return{"message": "you didnt have access to run this command"}
 
 class DeleteAsset(Resource):
+    @check_whitelist
     def delete(self, asset_id):
         # Membuat koneksi ke database
         db, lmd = get_db_connection()
@@ -131,6 +134,7 @@ class DeleteAsset(Resource):
             return {'message': "Asset with ID {} not found.".format(existing_asset)}, 404
         
 class StatusList(Resource):
+    @check_whitelist
     def get(self):
         db, lmd = get_db_connection()
         lmd.execute("SELECT * FROM status")
@@ -144,6 +148,7 @@ class StatusList(Resource):
         return jsonify(formatted_status_data)
     
 class LocationList(Resource):
+    @check_whitelist
     def get(self):
         db, lmd = get_db_connection()
         lmd.execute("SELECT * FROM location")
@@ -157,6 +162,7 @@ class LocationList(Resource):
         return jsonify(formatted_location_data)
 
 class CategoryList(Resource):
+    @check_whitelist
     def get(self):
         db, lmd = get_db_connection()
         lmd.execute("SELECT * FROM category")
@@ -170,6 +176,7 @@ class CategoryList(Resource):
         return jsonify(formatted_category_data)
     
 class ListAssetExcept(Resource):
+    @check_whitelist
     def get(self):
         db, lmd = get_db_connection()
         lmd.execute("SELECT * FROM assets WHERE status NOT IN ('in Loans', 'on Request', 'unAvailable')")

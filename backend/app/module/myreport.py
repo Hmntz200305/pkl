@@ -1,7 +1,7 @@
 from app.config_db import get_db_connection
 from flask_restful import Resource
 from flask import request
-from app.config_flask import SECRET_KEY
+from app.config_flask import SECRET_KEY, check_whitelist
 import jwt
 
 def verify_token(token):
@@ -14,6 +14,7 @@ def verify_token(token):
         return None
 
 class MyReport(Resource):
+    @check_whitelist
     def get(self):
         db, lmd = get_db_connection()
         
@@ -28,25 +29,25 @@ class MyReport(Resource):
             password = payload['password']
             if email and password:
                 
-                lmd.execute('SELECT * from ticket where email = %s', (email,))
-                loandata = lmd.fetchall()
+                lmd.execute('SELECT * from ticket where email = %s AND deleted = %s', (email, 0))
+                loandata_tickets = lmd.fetchall()
+                ticket_ids = [row[0] for row in loandata_tickets]
+
                 lmd.execute('SELECT count(*) from loandata where email = %s and status = %s', (email, 0))
                 onloan = lmd.fetchone()[0]
-                
                 lmd.execute('SELECT count(*) from ticket where email = %s and status = %s', (email, 0))
                 onrequest = lmd.fetchone()[0]
                 
                 myreport_list = []
-                for row, row_data in enumerate(loandata, start=1):
-                    idticket, idasset, username, leasedate, returndate, locationasset, emailuser, note, statusticket = row_data
-
-                    # Asset Information
+                for row, row_data in enumerate(loandata_tickets, start=1):
+                    idticket, idasset, username, leasedate, returndate, locationasset, emailuser, note, statusticket, deleted = row_data
+                    
                     lmd.execute('SELECT * from assets where id = %s', (idasset,))
                     assetinformation = lmd.fetchone()
 
                     lmd.execute('SELECT email,status from ticketingadmin where idticket = %s', (idticket,))
                     email_admin = lmd.fetchall() 
-                    
+
                     username_admin1 = username_admin2 = None
                     admin1_status = admin2_status = None
 
@@ -83,45 +84,12 @@ class MyReport(Resource):
                     else:
                         statusticket = 'on Request'
 
-                    # Ticket Checking
-                    
-                    lmd.execute('SELECT * from loandata where email = %s and deleted = %s AND idticket = %s', (email, 0, idticket))
-                    loandatas = lmd.fetchone()
-                    
-                    if loandatas:
-                        # Create a dictionary for each ticket and add it to the list
-                        loan_data = {
-                            'no': row,
-                            'id': loandatas[0],
-                            'idticket': idticket,
-                            'idasset': idasset,
-                            'name': loandatas[6],
-                            'leasedate': str(leasedate),
-                            'returndate': str(returndate),
-                            'email': email,
-                            'statusticket': statusticket,
-                            'asset': assetinformation[1],
-                            'assetname': assetinformation[2],
-                            'assetdescription': assetinformation[3],
-                            'assetbrand': assetinformation[4],
-                            'assetmodel': assetinformation[5],
-                            'assetstatus': assetinformation[6],
-                            'assetlocation': assetinformation[7],
-                            'assetcategory': assetinformation[8],
-                            'assetsn': assetinformation[9],
-                            'assetphoto': assetinformation[10],
-                            'admin1': username_admin1[0] if username_admin1 else None,
-                            'admin2': username_admin2[0] if username_admin2 else None,
-                            'admin1status': admin1_status,
-                            'admin2status': admin2_status,
-                        }
-                        myreport_list.append(loan_data)
-                    if statusticket == 'Decline':
-                        # Create a dictionary for each ticket and add it to the list
+                    if idticket in ticket_ids:
                         loan_data = {
                             'no': row,
                             'idticket': idticket,
                             'idasset': idasset,
+                            'name': username,
                             'leasedate': str(leasedate),
                             'returndate': str(returndate),
                             'email': email,
@@ -151,6 +119,7 @@ class MyReport(Resource):
                 return response_data, 200
 
 class MyReportDelete(Resource):
+    @check_whitelist
     def put(self, selectedMyReportID):
         db, lmd = get_db_connection()
         
@@ -164,7 +133,7 @@ class MyReportDelete(Resource):
             email = payload['email']
             password = payload['password']
             if email and password:
-                lmd.execute('UPDATE loandata set deleted = %s where id = %s and email = %s', ('1', selectedMyReportID, email))
+                lmd.execute('UPDATE ticket set deleted = %s where idticket = %s and email = %s', ('1', selectedMyReportID, email))
                 db.commit()
                 
                 return {'message': 'Successfuly Deleted'}

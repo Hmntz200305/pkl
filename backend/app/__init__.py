@@ -16,14 +16,6 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['QRCode_FOLDER'] = QRCode_FOLDER
 app.config['server_ip'] = server_ip
 
-# whitelisted_ips = ["https://sipanda.online/", "https://sipanda.online:2096/"]
-# @app.before_request
-# def check_whitelist():
-#     client_ip = request.referrer
-#     if client_ip not in whitelisted_ips:
-#         return abort(403)
-    
-
 api.add_resource(test, '/api/test')
 api.add_resource(Login, '/api/login')
 api.add_resource(Authentication, '/api/authentication')

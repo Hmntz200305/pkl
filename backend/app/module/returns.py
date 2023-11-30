@@ -1,5 +1,5 @@
 from app.config_db import get_db_connection
-from app.config_flask import SECRET_KEY
+from app.config_flask import SECRET_KEY, check_whitelist
 from flask_restful import Resource
 from flask import request
 from app.config_mail import mail
@@ -16,6 +16,7 @@ def verify_token(token):
         return None
 
 class inLoanAssetList(Resource):
+    @check_whitelist
     def get(self):
         db, lmd = get_db_connection()
         
@@ -60,6 +61,7 @@ class inLoanAssetList(Resource):
 
 
 class ReturnAsset(Resource):
+    @check_whitelist
     def post(self, selectedLoanID):
         db,lmd = get_db_connection()
         

@@ -1,7 +1,7 @@
 from app.config_db import get_db_connection
 from flask_restful import Resource
 from flask import request, jsonify
-from app.config_flask import SECRET_KEY
+from app.config_flask import SECRET_KEY, check_whitelist
 from app.config_mail import mail  
 from flask_mail import Message
 import jwt
@@ -23,6 +23,7 @@ def validate_lease(ids, name, leasedate, returndate, location, email_user, note,
     return True
 
 class LeaseTicket(Resource):
+    @check_whitelist
     def post(self):
         db, lmd = get_db_connection()
         
@@ -51,7 +52,7 @@ class LeaseTicket(Resource):
                     if not validate_lease(ids, name, leasedate, returndate, location, email_user, note, admin1 ,admin2):
                         return {"message": "Data is incomplete"}, 400
                     if data:
-                        lmd.execute('INSERT INTO ticket (idasset, name, leasedate, returndate, location, email, note, status) VALUES (%s, %s ,%s, %s, %s, %s, %s, %s)', (ids, name, leasedate, returndate, location, email_user, note, 0))
+                        lmd.execute('INSERT INTO ticket (idasset, name, leasedate, returndate, location, email, note, status, deleted) VALUES (%s, %s ,%s, %s, %s, %s, %s, %s, %s)', (ids, name, leasedate, returndate, location, email_user, note, 0, 0))
                         db.commit()
 
                         lmd.execute('UPDATE assets set status = %s where id = %s', ('on Request', ids))
@@ -87,6 +88,7 @@ class LeaseTicket(Resource):
 
 
 class LeaseSubmited(Resource):
+    @check_whitelist
     def get(self):
         db, lmd = get_db_connection()
 
@@ -127,7 +129,7 @@ class LeaseSubmited(Resource):
                 cekticket = lmd.fetchall()
 
                 for data in cekticket:
-                    idtickets, idasset, name, leasedate, returndate, location, email, note, status, idticketingadmin, idticketadmin, admin_email, admin_status, idassets, assets, assetname, assetdesc, assetbrand, assetmodel, assetstatus, assetlocation, assetcategory, assetsn, assetphoto, assetcreated = data
+                    idtickets, idasset, name, leasedate, returndate, location, email, note, status, deleted, idticketingadmin, idticketadmin, admin_email, admin_status, idassets, assets, assetname, assetdesc, assetbrand, assetmodel, assetstatus, assetlocation, assetcategory, assetsn, assetphoto, assetcreated = data
                     ticket_list.append({
                         'idticket': idtickets,
                         'idasset': idasset,
@@ -161,6 +163,7 @@ class LeaseSubmited(Resource):
         return jsonify(ticket_list)
 
 class TicketApprove(Resource):
+    @check_whitelist
     def put(self, selectedTicketId):
         db, lmd = get_db_connection()
         
@@ -243,6 +246,7 @@ class TicketApprove(Resource):
                     return {'message': f'Error: {error_message}'}
 
 class TicketDecline(Resource):
+    @check_whitelist
     def put(self, selectedTicketId):
         db, lmd = get_db_connection()
         

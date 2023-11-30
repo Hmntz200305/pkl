@@ -4,29 +4,57 @@ import DataTableExtensions from 'react-data-table-component-extensions';
 import 'react-data-table-component-extensions/dist/index.css';
 import { faCircleInfo, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faDownload, faFileCsv, faFileExport, faFileImport } from '@fortawesome/free-solid-svg-icons';
 import Modal from 'react-modal';
 import { useAuth } from '../AuthContext';
 Modal.setAppElement('#root');
 
 const MyReport = () => {
-     const { token, Role, refreshMyReport, MyReport, setNotification, setNotificationStatus } = useAuth();
+     const { token, Role, refreshMyReport, MyReport, setNotification, setNotificationStatus, openSidebar, setOpenSidebar, } = useAuth();
      const [selectedAssetDetails, setSelectedAssetDetails] = useState([]);
      const [dataWithRemainingTime, setDataWithRemainingTime] = useState([]);
      const [selectedMyReportID, setselectedMyReportID] = useState(null);
      const [isLoading, setIsLoading] = useState(false);
+     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+     const isMobile = windowWidth <= 768;
+     const [isDesktopView, setIsDesktopView] = useState(window.innerWidth > 768);
 
-     useEffect(() => {
-        const refreshData = async () => {
-            if (Role === 0 || Role === 1 || Role === 2) {
-                await refreshMyReport();
-            }
+
+    const handleResizeMobile = () => {
+        setIsDesktopView(window.innerWidth > 768);
+    }; 
+    
+    const handleResizeApp = () => {
+      if (window.innerWidth <= 768) {
+        setOpenSidebar(false);
+      } else {
+        setOpenSidebar(true);
+      }
+    };
+    
+    useEffect(() => {
+        window.addEventListener('resize', handleResizeMobile);
+  
+        return () => {
+        window.removeEventListener('resize', handleResizeMobile);
         };
+    }, []);
+  
+    useEffect(() => {
+      window.addEventListener('resize', handleResizeApp);
+      return () => {
+        window.removeEventListener('resize', handleResizeApp);
+      };
+    }, []);
 
-        refreshData();
+    useEffect(() => {
+        const refreshData = async () => {
+        if (Role === 0 || Role === 1 || Role === 2) {
+            await refreshMyReport();
+        }
+    };
+    refreshData();
 
-        window.addEventListener("beforeunload", refreshData);
-
+    window.addEventListener("beforeunload", refreshData);
         return () => {
             window.removeEventListener("beforeunload", refreshData);
         };
@@ -53,7 +81,6 @@ const MyReport = () => {
 
     // Modal
     const [showModalAsset, setShowModalAsset] = useState(false);
-
     const showMoreDetailHandler = (row) => {
         setSelectedAssetDetails([row]);
         setShowModalAsset(true);
@@ -260,14 +287,14 @@ const MyReport = () => {
                     {row.statusticket === 'Approved' ? (
                         <button 
                             className='bg-red-500 p-2 rounded-lg hover:bg-red-700 m-0.5' 
-                            onClick={() => showDeleteHandler(row.id)}
+                            onClick={() => showDeleteHandler(row.idticket)}
                         >
                             <FontAwesomeIcon icon={faTrash} />
                         </button>
                     ) : (
                         <button 
                             className='bg-red-500 p-2 rounded-lg hover:bg-red-700 m-0.5' 
-                            onClick={() => showDeleteHandler(row.id)} disabled
+                            onClick={() => showDeleteHandler(row.idticket)} disabled
                         >
                             <FontAwesomeIcon icon={faTrash} />
                         </button>
@@ -328,25 +355,52 @@ const MyReport = () => {
                     </div>
                 </div>
             </div>
+            
+            {isDesktopView && (
+                <Modal
+                    isOpen={showModalAsset}
+                    onRequestClose={closeModalAssetHandle}
+                    contentLabel="Contoh Modal"
+                    overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center"
+                    className={`modal-content bg-transparent p-4 w-screen ${openSidebar ? ' pl-[315px]' : ''}`}
+                    shouldCloseOnOverlayClick={false}
+                    >
+                    <div className='p-2 py-4 bg-white'>
+                        <h1>Ini adalah detail lengkap asset</h1>
+                            <DataTable
+                                columns={morecolumn}
+                                data={selectedAssetDetails}
+                                highlightOnHover
+                            />
+                        <button onClick={closeModalAssetHandle} className="main-btn mt-4">
+                            Close
+                        </button>
+                    </div>
+                </Modal>
+            )}
+            {!isDesktopView && (
+                <Modal
+                    isOpen={showModalAsset}
+                    onRequestClose={closeModalAssetHandle}
+                    contentLabel="Contoh Modal"
+                    overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center"
+                    className='modal-content bg-transparent p-4 w-screen'
+                    shouldCloseOnOverlayClick={false}
+                    >
+                    <div className='p-2 py-4 bg-white'>
+                        <h1>Ini adalah detail lengkap asset</h1>
+                            <DataTable
+                                columns={morecolumn}
+                                data={selectedAssetDetails}
+                                highlightOnHover
+                            />
+                        <button onClick={closeModalAssetHandle} className="main-btn mt-4">
+                            Close
+                        </button>
+                    </div>
+                </Modal>
+            )}
 
-            <Modal
-                isOpen={showModalAsset}
-                onRequestClose={closeModalAssetHandle}
-                contentLabel="Contoh Modal"
-                overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center"
-                className="modal-content bg-white w-1/2 p-4 rounded shadow-md"
-                shouldCloseOnOverlayClick={false}
-                >
-                <h1>Ini adalah detail lengkap asset</h1>
-                <DataTable
-                    columns={morecolumn}
-                    data={selectedAssetDetails}
-                    highlightOnHover
-                />
-                <button onClick={closeModalAssetHandle} className="main-btn mt-4">
-                    Close
-                </button>
-            </Modal>
             <div className='p-2'>
                 <DataTableExtensions
                 columns={columns}
@@ -370,4 +424,4 @@ const MyReport = () => {
         </>
     )
 }
-export default MyReport
+export default MyReport;

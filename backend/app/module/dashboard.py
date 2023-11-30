@@ -1,7 +1,9 @@
 from app.config_db import get_db_connection
 from flask_restful import Resource
+from app.config_flask import check_whitelist
 
 class DashboardInfo(Resource):
+    @check_whitelist
     def get(self):
         db, lmd = get_db_connection()
         

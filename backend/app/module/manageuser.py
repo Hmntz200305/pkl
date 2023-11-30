@@ -1,5 +1,5 @@
-from flask import Flask, jsonify, request, url_for, jsonify
-from app.config_flask import SECRET_KEY
+from flask import Flask, jsonify, request, url_for, jsonify, redirect
+from app.config_flask import SECRET_KEY, check_whitelist
 from app.config_db import get_db_connection
 from flask_restful import Resource, reqparse
 from app.config_mail import mail
@@ -24,6 +24,7 @@ def validate_register(username, email, password, roles):
     return True
 
 class Register(Resource):
+    @check_whitelist
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('username', type=str, required=True)
@@ -63,6 +64,7 @@ class Register(Resource):
                                 token = key.dumps(email)
                                 msg = Message('Verifikasi Email', sender='your_email@example.com', recipients=[email])
                                 verification_url = url_for('verifyemail', token=token, _external=True)
+                                # verification_url = "https://sipanda.online:2096/verify/" + token
                                 msg.body = f'Klik tautan ini untuk verifikasi email Anda: {verification_url}'
                                 mail.send(msg)
                                 db.commit()
@@ -81,6 +83,7 @@ class Register(Resource):
             return {"message": "Token Invalid"}
         
 class ManageUser(Resource):
+    @check_whitelist
     def get(self):
         db, lmd = get_db_connection()
         lmd.execute("SELECT * FROM users")
@@ -107,6 +110,7 @@ class ManageUser(Resource):
         return jsonify(formatted_data)
     
 class DeleteUser(Resource):
+    @check_whitelist
     def delete(self, no):
         db, lmd = get_db_connection()
         
@@ -126,6 +130,7 @@ class DeleteUser(Resource):
             return {'message': f"User {username} not found."}, 404
         
 class EditUser(Resource):
+    @check_whitelist
     def put(self, no):
         db, lmd = get_db_connection()
 
@@ -201,7 +206,7 @@ class VerifyEmail(Resource):
                 user_id = user_data[0]
                 lmd.execute("UPDATE users SET verified = %s WHERE id = %s", (1, user_id,))
                 db.commit()
-                return {'message': 'Email Anda telah berhasil diverifikasi. Anda dapat login sekarang.'}
+                return redirect('https://sipanda.online:2096')
             else:
                 return {'message': 'Email tidak ditemukan.'}
         except SignatureExpired:
