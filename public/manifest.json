@@ -4,7 +4,7 @@
   "icons": [
     {
       "src": "favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
+      "sizes": "65x65",
       "type": "image/x-icon"
     },
     {
@@ -31,5 +31,8 @@
   ],
   "id": "Asset Management",
   "description": "Asset Management Lintas Media Danawa",
-  "scope": "https://sipanda.online:2096"
+  "scope": "https://asset.lintasmediadanawa.com",
+  "serviceworker": {
+    "src": "/service-worker.js"
+  }
 }

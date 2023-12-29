@@ -9,11 +9,9 @@ const Dashboard = () => {
 
     useEffect(() => {
         refreshDashboardInfo();
-        // eslint-disable-next-line
     }, [])
 
-    // Fungsi untuk menghasilkan warna acak
-    function getRandomColor() {
+    const getRandomColor = () => {
         const letters = '0123456789ABCDEF';
         let color = '#';
         for (let i = 0; i < 6; i++) {
@@ -22,12 +20,8 @@ const Dashboard = () => {
         return color;
     }
 
-    // Efek samping (side effect) untuk mengatur warna latar belakang ikon saat komponen dimuat
     useEffect(() => {
-        // Mengambil semua elemen dengan kelas 'dashboard-icon'
         const dashboardIcons = document.querySelectorAll('.dashboard-icon');
-
-        // Loop melalui semua ikon dan mengatur warna latar belakangnya menggunakan warna acak
         dashboardIcons.forEach((icon) => {
             icon.style.backgroundColor = getRandomColor();
         });
@@ -36,8 +30,8 @@ const Dashboard = () => {
     return (
         <>
             <div className='p-2'>
-                <div className='bg-black mb-5 rounded-2xl p-4 shadow'>
-                    <h2 className='text-white'>Selamat datang di Dashboard page :)</h2>
+                <div className='dashboard-icon mb-5 rounded-2xl p-4 shadow'>
+                    <h2 className='text-white'>Welcome, Dashboard page :)</h2>
                 </div>
                 <div className='bg-white p-5'>
                     <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">

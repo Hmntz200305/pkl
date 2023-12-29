@@ -14,20 +14,20 @@ class QrGenerator(Resource):
         data = request.form
         
         if any(value == "" for value in data.values()):
-            return {"message": "All fields must be filled"}, 400
+            return {"message": "All fields must be filled", "Status": "error"}, 400
         
         required_fields = ["AssetID", "AssetName", "AssetDesc", "AssetBrand", "AssetModel", "AssetStatus", "AssetLocation", "AssetCategory", "AssetSN"]
         missing_fields = [field for field in required_fields if field not in data]
 
         if missing_fields:
-            return {"message": f"Missing required fields: {', '.join(missing_fields)}"}, 400
+            return {"message": f"Missing required fields: {', '.join(missing_fields)}", "Status": "error"}, 400
 
         asset_id = data["AssetID"]
         save_path = os.path.join(current_app.config['QRCode_FOLDER'], asset_id)
 
         # Memeriksa apakah folder sudah ada
         if os.path.exists(save_path):
-            return {"message": f"AssetID {asset_id} has been used. Use another AssetID."}, 400
+            return {"message": f"AssetID {asset_id} has been used. Use another AssetID.", "Status": "warning"}, 400
 
         # Membuat folder
         os.makedirs(save_path, exist_ok=True)
@@ -58,8 +58,8 @@ class QrGenerator(Resource):
         img = qr.make_image(fill_color="black", back_color="white")
         img.save(os.path.join(save_path, asset_id + '.png'))
         
-        link = f"https://sipanda.online:8443/static/QRCode/{asset_id}/{asset_id}.png"
-        return {"message": "QR Code has been created", "qr": link}, 200
+        link = f"https://asset.lintasmediadanawa.com:8443/static/QRCode/{asset_id}/{asset_id}.png"
+        return {"message": "QR Code has been created", "qr": link, "Status": "success"}, 200
 
 class QrScanner(Resource):
     @check_whitelist
@@ -73,7 +73,7 @@ class QrScanner(Resource):
         missing_fields = [field for field in required_fields if field not in data]
 
         if missing_fields:
-            return {"message": f"Missing required fields: {', '.join(missing_fields)}"}, 400
+            return {"message": f"Missing required fields: {', '.join(missing_fields)}", "Status": "warning"}, 400
         
         AssetID = data["AssetID"]
         AssetName = data["AssetName"]
@@ -93,7 +93,7 @@ class QrScanner(Resource):
         
         if validate > 0:
             lmd.close()
-            return {"message": "AssetID already in use"}, 409
+            return {"message": "AssetID already in use", "Status": "error"}, 409
         
         try:
             # Masukkan data ke dalam tabel assets
@@ -104,8 +104,8 @@ class QrScanner(Resource):
             db.commit()
             lmd.close()
             
-            return {"message": "QR Code successfully, Asset has been inputed"}
+            return {"message": "QR Code successfully, Asset has been inputed", "Status": "success"}
         except Exception as e:
             db.rollback()
             Error = ("message:", (str(e)))
-            return {"message": {"message": Error}}, 409
+            return {"message": {"message": Error}, "Status": "error"}, 409

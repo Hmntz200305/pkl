@@ -9,7 +9,6 @@ import hashlib
 
 
 def validate_reset(username, email, password):
-    # Tambahkan logika validasi login sesuai kebutuhan Anda
     return True
 
 key = URLSafeTimedSerializer('lmd%055')
@@ -41,7 +40,7 @@ class ForgotPassword(Resource):
             msg.body = f'Klik tautan ini untuk verifikasi Reset Password Anda: {verification_url}'
             mail.send(msg)
                                 
-            return {'message': 'Email telah dikirimkan'}
+            return {'message': 'Recovery Mail telah dikirim ke email', "Status": "success"}
             
             
 class VerifyEmailForgotPw(Resource):
@@ -54,7 +53,7 @@ class VerifyEmailForgotPw(Resource):
             password = user_info['password']
             lmd.execute('UPDATE users set password = %s where username = %s and email = %s', (password, username, email))
             db.commit()
-            return redirect('https://sipanda.online:2096')
+            return redirect('https://asset.lintasmediadanawa.com')
         except SignatureExpired:
             user_info = {
                 'username': username,

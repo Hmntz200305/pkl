@@ -40,7 +40,7 @@ class Register(Resource):
         
         token = request.headers.get('Authorization')
         if not token:
-            return {'message': 'Token is missing'}, 401
+            return {'message': 'Token is missing', 'Status': 'error'}, 401
         
         payload = verify_token(token)
         if payload:
@@ -64,23 +64,22 @@ class Register(Resource):
                                 token = key.dumps(email)
                                 msg = Message('Verifikasi Email', sender='your_email@example.com', recipients=[email])
                                 verification_url = url_for('verifyemail', token=token, _external=True)
-                                # verification_url = "https://sipanda.online:2096/verify/" + token
                                 msg.body = f'Klik tautan ini untuk verifikasi email Anda: {verification_url}'
                                 mail.send(msg)
                                 db.commit()
 
-                                return {"message": "Accounts Registration Success, Check your Email for Verification"}
+                                return {"message": "Accounts Registration Success, Check your Email for Verification", 'Status': 'success'}
                             except Exception as e:
                                 db.rollback()
                                 return {'message': f'Error: {str(e)}'}
                         else:
-                            return {"message": "Accounts already exists"}
+                            return {"message": "Accounts already exists", "Status": "error"}
                     else:
-                        return {"message": "Format Wrong"}
+                        return {"message": "Format Wrong", "Status": "warning"}
                 else:
-                    return {"message": "unauthorized"}
+                    return {"message": "unauthorized", "Status": "error"}
         else:
-            return {"message": "Token Invalid"}
+            return {"message": "Token Invalid", "Status": "error"}
         
 class ManageUser(Resource):
     @check_whitelist
@@ -124,10 +123,10 @@ class DeleteUser(Resource):
             lmd.execute("DELETE FROM users WHERE id = %s", (no,))
             db.commit()
             lmd.close()
-            return {'message': f"User {username} has been deleted."}, 200
+            return {'message': f"User {username} has been deleted.", "Status": "success"}, 200
         else:
             lmd.close()
-            return {'message': f"User {username} not found."}, 404
+            return {'message': f"User {username} not found.", "Status": "error"}, 404
         
 class EditUser(Resource):
     @check_whitelist
@@ -136,7 +135,7 @@ class EditUser(Resource):
 
         token = request.headers.get('Authorization')
         if not token:
-            return {'message': 'Token is missing'}, 401
+            return {'message': 'Token is missing', "Status": "error"}, 401
         
         payload = verify_token(token)
         if payload:
@@ -187,12 +186,12 @@ class EditUser(Resource):
                             db.commit()
                             lmd.close()
 
-                        return {'message': f"User {data.get('username')} has been updated."}, 200
+                        return {'message': f"User {data.get('username')} has been updated.", "Status": "success"}, 200
                     else:
                         lmd.close()
-                        return {"message": f"User {data.get('username')} not found."}, 404
+                        return {"message": f"User {data.get('username')} not found.", "Status": "error"}, 404
                 else:
-                    return{"message": "you didnt have access to run this command"}
+                    return{"message": "you didnt have access to run this command", "Status": "error"}
                 
 
 class VerifyEmail(Resource):
@@ -206,15 +205,15 @@ class VerifyEmail(Resource):
                 user_id = user_data[0]
                 lmd.execute("UPDATE users SET verified = %s WHERE id = %s", (1, user_id,))
                 db.commit()
-                return redirect('https://sipanda.online:2096')
+                return redirect('https://asset.lintasmediadanawa.com')
             else:
-                return {'message': 'Email tidak ditemukan.'}
+                return {'message': 'Email tidak ditemukan.', "Status": "error"}
         except SignatureExpired:
             new_token = key.dumps(email)
             msg = Message('Verifikasi Email', sender='your_email@example.com', recipients=[email])
             verification_url = url_for('VerifyEmail', token=new_token, _external=True)  # URL baru
             msg.body = f'Token lama telah kadaluwarsa. Klik tautan ini untuk verifikasi email Anda: {verification_url}'
             mail.send(msg)
-            return {'message': 'Token expired, new verification link sent to your email'}
+            return {'message': 'Token expired, new verification link sent to your email', "Status": "warning"}
 
 

@@ -1,18 +1,21 @@
-import React, { useState } from 'react'
-import { faLock, faThumbsUp, faThumbsDown } from '@fortawesome/free-solid-svg-icons';
+import React, { useState, useEffect } from 'react'
+import { faLock, faThumbsUp, faThumbsDown, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { faEnvelope } from '@fortawesome/free-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAuth } from './AuthContext';
 import Modal from 'react-modal';
+import { Bounce,  ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 Modal.setAppElement('#root');
 
 const Login = () => {
-    const { login, setNotification, Notification, setNotificationStatus, NotificationStatus, NotificationInfo, setNotificationInfo } = useAuth();
+    const { login, setNotification, Notification, setNotificationStatus, NotificationStatus, NotificationInfo, setNotificationInfo, setLoginNotificationStatus, LoginNotificationStatus } = useAuth();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [FEmail, setFEmail] = useState("");
     const [FUsername, setFUsername] = useState("");
     const [FPassword, setFPassword] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
 
     if (NotificationStatus) {
       setTimeout(() => {
@@ -36,8 +39,14 @@ const Login = () => {
   
     // POST ke API
     const handleLogin = async () => {
+        if ((!email || email.trim() === '') || (!password || password.trim() === '')) {
+          setNotification('Harap Email dan Password diisi');
+          setLoginNotificationStatus(true);
+          setNotificationInfo('warning');
+        }
         try {
-          const response = await fetch("https://sipanda.online:8443/api/login", {
+          setIsLoading(true);
+          const response = await fetch("https://asset.lintasmediadanawa.com:8443/api/login", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -50,20 +59,29 @@ const Login = () => {
             login(data);
             setNotification(data.message);
             setNotificationStatus(true);
+            setNotificationInfo(data.Status);
           } else {
             const data = await response.json();
             setNotification(data.message);
-            setNotificationStatus(true);
-            setNotificationInfo('Error');
+            setLoginNotificationStatus(true);
+            setNotificationInfo(data.Status);
           }
         } catch (error) {
           console.error("Error:", error);
+        } finally {
+          setIsLoading(false);
         }
       };
 
       const handleForgotPassword = async () => {
+        if ((!FUsername || FUsername.trim() === '') || (!FEmail || FEmail.trim() === '') || (!FPassword || FEmail.trim() === '')) {
+          setNotification('Harap semua form diisi');
+          setLoginNotificationStatus(true);
+          setNotificationInfo('warning');
+        }
+
         try {
-          const response = await fetch("https://sipanda.online:8443/api/forgotpassword", {
+          const response = await fetch("https://asset.lintasmediadanawa.com:8443/api/forgotpassword", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -73,20 +91,77 @@ const Login = () => {
     
           if (response.status === 200) {
             const data = await response.json();
+            setNotification(data.message);
+            setNotificationStatus(true);
+            setNotificationInfo(data.Status);
             setFUsername('');
             setFEmail('');
             setFPassword('');
-            console.log("Email Recovery sending");
+            setShowModalForgot(false);
           } else {
-            console.log("Email Recovery Failed");
+            const data = await response.json();
+            setNotification(data.message);
+            setLoginNotificationStatus(true);
+            setNotificationInfo(data.Status);
           }
         } catch (error) {
           console.error("Error:", error);
         }
       };
 
+      useEffect(() => {
+        if (LoginNotificationStatus) {
+          if (NotificationInfo === 'error') {
+            toast.error(
+              <p className='ml-3'>
+                {Notification}
+              </p>,
+            {
+              icon: (
+                <div className='bg-red-500 p-2 rounded-xl flex items-center w-8 h-8 '>
+                  <FontAwesomeIcon icon={faThumbsDown} />
+                </div>
+              )
+            });
+          } else if (NotificationInfo === 'warning') {
+            toast.warning(
+              <p>
+                {Notification}
+              </p>,
+            {
+              icon: (
+                <div className='bg-yellow-700 p-2 rounded-xl flex items-center w-8 h-8'>
+                  <FontAwesomeIcon icon={faTriangleExclamation} />
+                </div>
+              )
+            });
+          } else {
+          }
+        } else {
+        }
+    
+        setNotificationStatus(false);
+        setNotification('');
+        setNotificationInfo('');
+      }, [LoginNotificationStatus, NotificationInfo, Notification]);
+
     return (
         <div className='bg-[#efefef]'>
+          <div>
+            <ToastContainer
+              position="top-right"
+              autoClose={3000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+              theme="dark"
+              transition={Bounce}
+            />
+          </div>
           {NotificationStatus ? (
               <div className={`notification ${NotificationStatus ? 'slide-in' : 'slide-out'}`}>
                 <div class="flex items-center lg:w-[300px] md:w-[250px] sm:w-[200px] p-4 opacity-90 rounded-lg shadow bg-gray-900">
@@ -148,8 +223,9 @@ const Login = () => {
                           type="submit"
                           onClick={handleLogin}
                           className="w-full py-2 bg-gray-800 text-white font-semibold rounded-lg hover:bg-gray-700 focus:outline-none"
+                          disabled={isLoading}
                         >
-                          Login
+                          {isLoading ? 'Login...' : 'Login'}
                         </button>
                         <div className="text-center">
                             <button className="text-black hover:underline focus:outline-none" onClick={showModalForgotHandle}>Forgot password?</button>

@@ -35,7 +35,7 @@ class Login(Resource):
         password = args['password']
 
         if not email or not password:
-            return {'message': 'The form must be filled in'}, 400
+            return {'message': 'The form must be filled in', "Status": "warning"}, 400
         
         # Lakukan validasi login
         if validate_login(email, password):
@@ -56,15 +56,15 @@ class Login(Resource):
                     if fetch:
                         username, email, role = fetch[0], fetch[1], fetch[2]
                         token = generate_token(email, md5password)
-                        return {'message': 'Berhasil Login', 'token': token, 'username': username, 'email': email, 'role': role}
+                        return {'message': 'Login Berhasil', 'token': token, 'username': username, 'email': email, 'role': role, "Status": "success"}
                     else:
-                        return {'message': 'Login failed: Email not found or incorrect password'}, 401
+                        return {'message': 'Login failed: Email not found or incorrect password', "Status": "error"}, 401
                 else:
-                    return {'message': 'Please Verification your email first'}, 401
+                    return {'message': 'Please Verification your email first', "Status": "warning"}, 401
             else:
-                return {'message': 'Login failed: Email not found or incorrect password'}, 401
+                return {'message': 'Login failed: Email not found or incorrect password', "Status": "error"}, 401
         else:
-            return {'message': 'Login failed: Validation failed'}, 401
+            return {'message': 'Login failed: Validation failed', "Status": "error"}, 401
 
 
 class Authentication(Resource):
@@ -74,7 +74,7 @@ class Authentication(Resource):
 
         token = request.headers.get('Authorization')
         if not token:
-            return {'message': 'Token is missing'}, 401
+            return {'message': 'Token is missing', "Status": "error"}, 401
         
         payload = verify_token(token)
         if payload:
@@ -92,11 +92,11 @@ class Authentication(Resource):
                 else:
                     roles = 'User'
                 
-                return{'role': role, 'username': username, 'roles': roles}
+                return{'role': role, 'username': username, 'roles': roles, "Status": "success"}
             else:
-                 return{"message": "Email does not exist"}   
+                 return{"message": "Email does not exist", "Status": "error"}   
         else:
-            return{"message": "Invalid Token"}
+            return{"message": "Invalid Token", "Status": "error"}
         
 class AdminList(Resource):
     @check_whitelist

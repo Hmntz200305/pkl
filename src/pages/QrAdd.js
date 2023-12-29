@@ -12,7 +12,6 @@ const QRScanner = () => {
   const [scanning, setScanning] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const qrReaderRef = useRef(null);
-  const { token } = useAuth();
 
   const handleScan = (data) => {
     if (data) {
@@ -63,31 +62,9 @@ const QRScanner = () => {
     }
   };
   
-  const qrReaderStyle = {
-    width: '100%',
-    maxWidth: '400px',
-    margin: 'auto',
-    position: 'relative',
-    border: '2px solid #25d366', // WhatsApp green color
-    borderRadius: '8px',
-  };
-
-  const scanOverlayStyle = {
-    position: 'absolute',
-    top: '0',
-    left: '0',
-    right: '0',
-    bottom: '0',
-    border: '2px solid #25d366', // WhatsApp green color
-    borderRadius: '8px',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    background: 'rgba(37, 211, 102, 0.3)', // WhatsApp green color with some transparency
-  };
 
   const handleSubmit = async (token) => {
-  const apiUrl = 'https://sipanda.online:8443/api/qrscanner';
+  const apiUrl = 'https://asset.lintasmediadanawa.com:8443/api/qrscanner';
   const dataToSend = tableData.length > 0 ? tableData[0] : null;
 
   if (dataToSend) {
@@ -104,17 +81,21 @@ const QRScanner = () => {
       });
 
       setNotification('IDAsset Already Exist');
+      setNotificationInfo("error");
       setNotificationStatus(false);
 
       if (response.ok) {
         setNotification('Request successful');
         setNotificationStatus(true);
+        setNotificationInfo("error");
       } else {
         setNotification('IDAsset Already Exist');
+        setNotificationInfo("error");
         setNotificationStatus(false);
       }
     } catch (error) {
       setNotification('Error sending data to API');
+      setNotificationInfo("error");
       setNotificationStatus(false);
     } finally {
       setSubmitting(false);
@@ -171,7 +152,7 @@ const QRScanner = () => {
   ];
 
   return (
-    <div className="" style={qrReaderStyle}>
+    <div>
       {scanning && (
         <QrReader
           ref={qrReaderRef}

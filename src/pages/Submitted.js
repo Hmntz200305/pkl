@@ -8,7 +8,7 @@ import Modal from 'react-modal';
 Modal.setAppElement('#root');
 
 const Submitted = () => {
-    const { token, Role, SubmitedList, refreshSubmitedList, setNotification, setNotificationStatus, openSidebar, setOpenSidebar } = useAuth();
+    const { token, Role, SubmitedList, refreshSubmitedList, setNotification, setNotificationStatus, setNotificationInfo, openSidebar, setOpenSidebar } = useAuth();
     const [showApprove, setShowApprove] = useState(false);
     const [showDecline, setShowDecline] = useState(false);
     const [selectedTicketId, setSelectedTicketId] = useState(null);
@@ -84,7 +84,7 @@ const Submitted = () => {
         formData.append('SelectedTicketingAdmin', SelectedTicketingAdmin);
   
         const response = await fetch(
-          `https://sipanda.online:8443/api/ticketapprove/${selectedTicketId}`,
+          `https://asset.lintasmediadanawa.com:8443/api/ticketapprove/${selectedTicketId}`,
           {
             method: 'PUT',
             headers: {
@@ -98,6 +98,7 @@ const Submitted = () => {
           const data = await response.json();
           setNotification(data.message);
           setNotificationStatus(true);
+          setNotificationInfo(data.Status);
           setShowApprove(false);
           refreshSubmitedList();
           setSelectedTicketId(null);
@@ -105,6 +106,7 @@ const Submitted = () => {
           setSelectedTicketSenderName(null);
         } else {
           setNotification('Failed to approve');
+          setNotificationInfo("error");
           setNotificationStatus(true);
         }
       } catch (error) {
@@ -119,7 +121,7 @@ const Submitted = () => {
         setIsLoading(true);
   
         const response = await fetch(
-          `https://sipanda.online:8443/api/ticketdecline/${selectedTicketId}`,
+          `https://asset.lintasmediadanawa.com:8443/api/ticketdecline/${selectedTicketId}`,
           {
             method: 'PUT',
             headers: {
@@ -132,6 +134,7 @@ const Submitted = () => {
           const data = await response.json();
           setNotification(data.message);
           setNotificationStatus(true);
+          setNotificationInfo(data.Status);
           setShowDecline(false);
           refreshSubmitedList();
           setSelectedTicketId(null);
@@ -139,6 +142,7 @@ const Submitted = () => {
           setSelectedTicketSenderName(null);
         } else {
           setNotification('Failed');
+          setNotificationInfo("error");
           setNotificationStatus(true);
         }
       } catch (error) {  

@@ -20,7 +20,7 @@ class MyReport(Resource):
         
         token = request.headers.get('Authorization')
         if not token:
-            return {'message': 'Token is missing'}, 401
+            return {'message': 'Token is missing', "Status": "error"}, 401
 
         payload = verify_token(token)
 
@@ -125,7 +125,7 @@ class MyReportDelete(Resource):
         
         token = request.headers.get('Authorization')
         if not token:
-            return {'message': 'Token is missing'}, 401
+            return {'message': 'Token is missing', "Status": "error"}, 401
 
         payload = verify_token(token)
 
@@ -136,8 +136,8 @@ class MyReportDelete(Resource):
                 lmd.execute('UPDATE ticket set deleted = %s where idticket = %s and email = %s', ('1', selectedMyReportID, email))
                 db.commit()
                 
-                return {'message': 'Successfuly Deleted'}
+                return {'message': 'Successfuly Deleted', "Status": "success"}
             else:
-                return {'message': 'Email Password Not Found'}
+                return {'message': 'Email Password Not Found', "Status": "error"}
         else:
-            return {'message': 'Token Invalid'}
+            return {'message': 'Token Invalid', "Status": "error"}

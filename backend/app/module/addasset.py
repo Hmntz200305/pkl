@@ -31,7 +31,7 @@ class AddAsset(Resource):
         
         token = request.headers.get('Authorization')
         if not token:
-            return {'message': 'Token is missing'}, 401
+            return {'message': 'Token is missing', "Status": "error"}, 401
         
         payload = verify_token(token)
         
@@ -56,7 +56,7 @@ class AddAsset(Resource):
                     # Mengelola file yang diunggah (gambar) jika ada
                     file = request.files.get('addAssetImage')
                     if not validate_addasset(ids, nama, deskripsi, brand, model, status, lokasi, kategori, sn):
-                        return {"message": "Data is incomplete"}, 400
+                        return {"message": "Data is incomplete", "Status": "warning"}, 400
                     lmd.execute('SELECT count(*) from assets where asset = %s', (ids,))
                     checking = lmd.fetchone()[0]
                     if checking == 0:
@@ -71,17 +71,17 @@ class AddAsset(Resource):
                             lmd.execute("INSERT INTO assets (asset, name, description, brand, model, status, location, category, serialnumber, photo) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (ids, nama, deskripsi, brand, model, status, lokasi, kategori, sn, image_path,))
                             db.commit()
                             lmd.close()
-                            return {"message": "Asset successfully added with Photo"}, 200
+                            return {"message": "Asset successfully added with Photo", "Status": "success"}, 200
                         else:
                             image_path = (current_app.config['server_ip'] + '/static/Default/images.jfif')
                             lmd.execute("INSERT INTO assets (asset, name, description, brand, model, status, location, category, serialnumber, photo) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (ids, nama, deskripsi, brand, model, status, lokasi, kategori, sn, image_path))
                             db.commit()
                             lmd.close()
-                        return {"message": "Asset successfully added"}, 200
+                        return {"message": "Asset successfully added", "Status": "success"}, 200
                     else:
-                        return {'message': 'AssetID telah tersedia, inputkan dengan ID yang berbeda'}, 400
+                        return {'message': 'AssetID telah tersedia, inputkan dengan ID yang berbeda', "Status": "error"}, 400
                 else:
-                    return {"message": "You don't have access to run this command"}, 403
+                    return {"message": "You don't have access to run this command", "Status": "error"}, 403
 
 
 class AddStatus(Resource):
@@ -91,7 +91,7 @@ class AddStatus(Resource):
         
         token = request.headers.get('Authorization')
         if not token:
-            return {'message': 'Token is missing'}, 401
+            return {'message': 'Token is missing', "Status": "error"}, 401
         
         payload = verify_token(token)
         
@@ -107,16 +107,16 @@ class AddStatus(Resource):
                     lmd.execute("SELECT status FROM status WHERE id = %s", (newStatus,))
                     existing_asset = lmd.fetchone()
                     if not newStatus:
-                        return {'message': 'The form must be filled in'}, 401
+                        return {'message': 'The form must be filled in', "Status": "warning"}, 401
                     if existing_asset:
-                        return {"message": "Status exist"}
+                        return {"message": "Status exist", "Status": "error"}
                     else:
                         lmd.execute("INSERT INTO status (status) VALUES (%s)", (newStatus,))
                         db.commit()
                         lmd.close()
-                        return {"message": "Status Sucess added"}, 200
+                        return {"message": "Status Sucess added", "Status": "success"}, 200
                 else:
-                    return{"message": "you didnt have access to run this command"}
+                    return{"message": "you didnt have access to run this command", "Status": "error"}
     
 
 class AddLocation(Resource):
@@ -126,7 +126,7 @@ class AddLocation(Resource):
         
         token = request.headers.get('Authorization')
         if not token:
-            return {'message': 'Token is missing'}, 401
+            return {'message': 'Token is missing', "Status": "error"}, 401
         
         payload = verify_token(token)
         
@@ -140,18 +140,18 @@ class AddLocation(Resource):
                     data = request.get_json()
                     newLocation = data.get('newLocation')
                     if not newLocation:
-                        return {'message': 'The form must be filled in'}, 401
+                        return {'message': 'The form must be filled in', "Status": "warning"}, 401
                     lmd.execute("SELECT lokasi FROM location WHERE id = %s", (newLocation,))
                     existing_asset = lmd.fetchone()
                     if existing_asset:
-                        return {"message": "Status exist"}
+                        return {"message": "Status exist", "Status": "error"}
                     else:
                         lmd.execute("INSERT INTO location (lokasi) VALUES (%s)", (newLocation,))
                         db.commit()
                         lmd.close()
-                        return {"message": "Location Sucess added"}, 200
+                        return {"message": "Location Sucess added", "Status": "success"}, 200
                 else:
-                    return{"message": "you didnt have access to run this command"}
+                    return{"message": "you didnt have access to run this command", "Status": "error"}
                 
 class AddCategory(Resource):
     @check_whitelist
@@ -160,7 +160,7 @@ class AddCategory(Resource):
         
         token = request.headers.get('Authorization')
         if not token:
-            return {'message': 'Token is missing'}, 401
+            return {'message': 'Token is missing', "Status": "error"}, 401
         
         payload = verify_token(token)
         
@@ -174,7 +174,7 @@ class AddCategory(Resource):
                     data = request.get_json()
                     newCategory = data.get('newCategory')
                     if not newCategory:
-                        return {'message': 'The form must be filled in'}, 401
+                        return {'message': 'The form must be filled in', "Status": "warning"}, 401
                     lmd.execute("SELECT kategori FROM category WHERE id = %s", (newCategory,))
                     existing_asset = lmd.fetchone()
                     if existing_asset:
@@ -183,6 +183,6 @@ class AddCategory(Resource):
                         lmd.execute("INSERT INTO category (kategori) VALUES (%s)", (newCategory,))
                         db.commit()
                         lmd.close()
-                        return {"message": "Category Sucess added"}, 200
+                        return {"message": "Category Sucess added", "Status": "success"}, 200
                 else:
-                    return{"message": "you didnt have access to run this command"}
+                    return{"message": "you didnt have access to run this command", "Status": "error"}

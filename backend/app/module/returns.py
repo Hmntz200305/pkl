@@ -98,8 +98,8 @@ class ReturnAsset(Resource):
                     message.body = f'Ticket Number {loandataticketid}\n' \
                                    f'Atas Nama {username} telah mengembalikan Asset {assetname}\n'
                     mail.send(message)
-                    return {'message': f'Barang {assetname} sudah dikembalikan'}
+                    return {'message': f'Barang {assetname} sudah dikembalikan', "Status": "success"}
                 except:
                     db.rollback()
-                    return {'message': 'Have some error'}
+                    return {'message': 'Have some error', "Status": "error"}
         

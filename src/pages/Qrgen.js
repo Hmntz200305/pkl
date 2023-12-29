@@ -33,7 +33,7 @@ const Qrgen = () => {
       formData.append('AssetCategory', AssetCategory);
       formData.append('AssetSN', AssetSN);
 
-      const response = await fetch("https://sipanda.online:8443/api/qrgenerator", {
+      const response = await fetch("https://asset.lintasmediadanawa.com:8443/api/qrgenerator", {
         method: "POST",
         body: formData,
       });
@@ -43,11 +43,12 @@ const Qrgen = () => {
         setQRCode(data.qr);
         setNotification(data.message);
         setNotificationStatus(true);
+        setNotificationInfo(data.Status);
       } else {
         const data = await response.json();
         setNotification(data.message);
         setNotificationStatus(true);
-        setNotificationInfo('Error');
+        setNotificationInfo(data.Status);
       }
     } catch (error) {
       console.error("Error:", error);

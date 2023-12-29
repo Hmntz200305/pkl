@@ -6,7 +6,7 @@ import { useAuth } from '../AuthContext';
 import { Input, Menu, MenuList, MenuItem, MenuHandler, Button } from "@material-tailwind/react";
 
 const Lease = () => {
-    const { token, DataListAssetExcept, refreshAssetDataExcept, LocationOptions, refreshLocationList, refreshAdminList, AdminList, username, setNotification, setNotificationStatus } = useAuth();
+    const { token, DataListAssetExcept, refreshAssetDataExcept, LocationOptions, refreshLocationList, refreshAdminList, AdminList, username, setNotification, setNotificationStatus, setNotificationInfo } = useAuth();
     const [showTable, setShowTable] = useState(true);
     const [showFormulir, setShowFormulir] = useState(false);
     const [Name, setName] = useState('');
@@ -92,7 +92,7 @@ const Lease = () => {
           formData.append('Admin1', selectedAdmin1)
           formData.append('Admin2', selectedAdmin2)
   
-          const response = await fetch("https://sipanda.online:8443/api/leaseticket", {
+          const response = await fetch("https://asset.lintasmediadanawa.com:8443/api/leaseticket", {
             method: "POST",
             headers: {
               Authorization: token,
@@ -104,6 +104,7 @@ const Lease = () => {
             const data = await response.json();
             setNotification(data.message);
             setNotificationStatus(true);
+            setNotificationInfo(data.Status);
             showTableHandler();
             refreshAssetDataExcept();
             setSelectedAssets([]);
@@ -115,6 +116,7 @@ const Lease = () => {
           } else {
             setNotification('Diharapkan mengisi semua Form');
             setNotificationStatus(true);
+            setNotificationInfo("warning");
           }
         } catch (error) {
           console.error("Error:", error);
@@ -125,12 +127,9 @@ const Lease = () => {
     
 
     const handleRowDeselected = (row) => {
-      // Hapus baris yang dibatalkan pemilihannya dari state selectedAssets
       setSelectedAssets(selectedAssets.filter((asset) => asset.id !== row.id));
     };
       
-
-    // Fungsi untuk menampilkan tabel dan menyembunyikan formulir
     const showTableHandler = () => {
         setSelectedAssets([]);
         setShowTable((prev) => !prev);
@@ -280,146 +279,6 @@ const Lease = () => {
                         data={selectedAssets}
                     />
 
-                    {/* <div className='bg-yellow-500'>
-                        <h2 className='border-t-[1px] border-black mt-4 pt-4'>Untuk melanjutkan tranasaksi peminjaman, silahkan isi formulir dibawah ini:</h2>
-                        <div className='flex'>
-                            <div className='form-group'>
-                                <label className='label-text'>Nama Anda</label>
-                                <input 
-                                type="text" 
-                                className='form-input cursor-not-allowed' 
-                                id="nama" 
-                                name="name" 
-                                value={Name}
-                                placeholder="Masukkan Nama Anda" 
-                                onChange={(e) => setName(e.target.value)}
-                                required disabled
-                                />
-                            </div>
-                            <div className='form-group'>
-                                <label className='label-text'>Lokasi</label>
-                                <div className='dropdown-container'>
-                                    <select 
-                                    className='category-dropdown' 
-                                    name='lokasi'
-                                    value={Location}
-                                    onChange={(e) => setLocation(e.target.value)}  
-                                    required
-                                    >
-                                    <option value="" disabled selected>Select Location</option>
-                                            {LocationOptions.map((location) => (
-                                                <option key={location.id} value={location.location}>
-                                                {location.location}
-                                                </option>
-                                            ))}
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div className='flex'>
-                            <div className='form-group'>
-                                <label className='label-text'>Checkout Date</label>
-                                <input 
-                                type="date" 
-                                className='form-input' 
-                                placeholder="Masukkan Nama Anda" 
-                                onChange={(e) => setCheckoutDate(e.target.value)}  
-                                required />
-                            </div>
-                            <div className='form-group'>
-                                <label className='label-text'>Checkin Date</label>
-                                <input 
-                                type="date" 
-                                className='form-input' 
-                                placeholder="Masukkan Nama Anda" 
-                                onChange={(e) => setCheckinDate(e.target.value)}  
-                                required />
-                            </div>
-                        </div>
-                        <div className='flex'>
-                            <div className='form-group'>
-                                <label className='label-text'>Email</label>
-                                <input 
-                                type="email" 
-                                className='form-input' 
-                                placeholder="Masukkan Email Anda" 
-                                value={Email}
-                                onChange={(e) => setEmail(e.target.value)}  
-                                disabled />
-                            </div>
-                            <div className='form-group'>
-                                <label className='label-text'>Note</label>
-                                <textarea 
-                                className='form-input' 
-                                placeholder="" required 
-                                onChange={(e) => setNote(e.target.value)}  
-                                />
-                            </div>
-                        </div>
-                        <div className='flex'>
-                            <div className='form-group'>
-                                <label className='label-text'>Admin 1</label>
-                                <div className='dropdown-container'>
-                                    <select 
-                                    className='category-dropdown' 
-                                    name='Admin 1' 
-                                    onChange={(e) => {
-                                        const selectedAdmin = e.target.value;
-                                        setSelectedAdmin1(selectedAdmin);
-                                    }}
-                                    >
-                                        <option value='' disable selected>Select Admin 1</option>
-                                        {AdminList.map((admin) => (
-                                            <option 
-                                                key={admin.email} 
-                                                value={admin.email} 
-                                                disabled={admin.email === selectedAdmin2}
-                                            >
-                                                {admin.username}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-                            </div>
-                            <div className='form-group'>
-                                <label className='label-text'>Admin 2</label>
-                                <div className='dropdown-container'>
-                                    <select 
-                                    className='category-dropdown' 
-                                    name='Admin 2'
-                                    value={selectedAdmin2}
-                                    onChange={(e) => {
-                                        const selectedAdmin = e.target.value;
-                                        setSelectedAdmin2(selectedAdmin);
-                                    }}
-                                    >
-                                        <option value='' disable selected>Select Admin 2</option>
-                                        {AdminList.map((admin) => (
-                                            <option 
-                                                key={admin.email} 
-                                                value={admin.email} 
-                                                disabled={admin.email === selectedAdmin1}
-                                            >
-                                                {admin.username}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div className='flex justify-end mt-4'>
-                            <button
-                                className='main-btn'
-                                type='submit'
-                                onClick={() => handleLeaseAsset(token)}
-                                disabled={isLoading} // Tombol akan dinonaktifkan selama permintaan sedang diproses
-                            >
-                                {isLoading ? 'Submitting...' : 'Submit'}
-                            </button>
-                        </div>
-                    </div> */}
-
-                    {/* KEDUA */}
                     <div className='bg-white'>
                         <h2 className='border-t-[1px] border-black pt-4 mt-8'>
                             Untuk melanjutkan tranasaksi peminjaman, silahkan isi formulir dibawah ini:
@@ -593,7 +452,7 @@ const Lease = () => {
                                 className='main-btn'
                                 type='submit'
                                 onClick={() => handleLeaseAsset(token)}
-                                disabled={isLoading} // Tombol akan dinonaktifkan selama permintaan sedang diproses
+                                disabled={isLoading}
                             >
                                 {isLoading ? 'Submitting...' : 'Submit'}
                             </button>

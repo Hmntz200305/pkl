@@ -19,7 +19,7 @@ const Verify = () => {
   const handleVerify = async () => {
     try {
       // Kirim token ke backend untuk verifikasi
-      const response = await fetch(`https://sipanda.online:8443/verifyemail/${token}`, {
+      const response = await fetch(`https://asset.lintasmediadanawa.com:8443/verifyemail/${token}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

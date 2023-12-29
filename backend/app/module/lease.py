@@ -29,7 +29,7 @@ class LeaseTicket(Resource):
         
         token = request.headers.get('Authorization')
         if not token:
-            return {'message': 'Token is missing'}, 401
+            return {'message': 'Token is missing', "Status": "error"}, 401
         
         payload = verify_token(token)
         
@@ -50,7 +50,7 @@ class LeaseTicket(Resource):
                     admin2 = data.get('Admin2')
 
                     if not validate_lease(ids, name, leasedate, returndate, location, email_user, note, admin1 ,admin2):
-                        return {"message": "Data is incomplete"}, 400
+                        return {"message": "Data is incomplete", "Status": "warning"}, 400
                     if data:
                         lmd.execute('INSERT INTO ticket (idasset, name, leasedate, returndate, location, email, note, status, deleted) VALUES (%s, %s ,%s, %s, %s, %s, %s, %s, %s)', (ids, name, leasedate, returndate, location, email_user, note, 0, 0))
                         db.commit()
@@ -70,7 +70,7 @@ class LeaseTicket(Resource):
                         message = Message(f'Peminjaman Barang LMD', sender='nakatsuuchiha@gmail.com', recipients=[admin1])
                         message.body = f'Ticket Number {idticket}\n' \
                                        f'Atas Nama {name} ingin meminjam barang {assetname}\n' \
-                                        'Klick Link untuk tindak/informasi lebih lanjut: http://sipanda.online:8080/submitted'
+                                        'Klick Link untuk tindak/informasi lebih lanjut: https://asset.lintasmediadanawa.com:8443/submitted'
                                         
                         mail.send(message)
 
@@ -79,12 +79,12 @@ class LeaseTicket(Resource):
 
                     lmd.close()
                     db.close()
-                    return {"message": "Lease successfully Send"}, 200
+                    return {"message": "Lease successfully Send", "Status": "success"}, 200
                 except:
                     db.rollback()
-                    return {"message": "Error Mail"}
+                    return {"message": "Error Mail", "Status": "error"}
             else:
-                return {"message": "You don't have access to run this command"}, 403
+                return {"message": "You don't have access to run this command", "Status": "error"}, 403
 
 
 class LeaseSubmited(Resource):
@@ -94,7 +94,7 @@ class LeaseSubmited(Resource):
 
         token = request.headers.get('Authorization')
         if not token:
-            return {'message': 'Token is missing'}, 401
+            return {'message': 'Token is missing', "Status": "error"}, 401
 
         payload = verify_token(token)
 
@@ -169,7 +169,7 @@ class TicketApprove(Resource):
         
         token = request.headers.get('Authorization')
         if not token:
-            return {'message': 'Token is missing'}, 401
+            return {'message': 'Token is missing', 'Status': 'error'}, 401
 
         payload = verify_token(token)
 
@@ -208,11 +208,11 @@ class TicketApprove(Resource):
                                     message.body = f'Ticket Number {selectedTicketId}\n' \
                                                        f'Atas Nama {data[3]} ingin meminjam barang {assetname}\n' \
                                                        f'Admin Pertama atas nama {usernameadmin1}({fetch_ticketingadmin}) telah menyetujui Pengajuan ini\n' \
-                                                        'Klick Link untuk tindak/informasi lebih lanjut: http://sipanda.online:8080/submitted'
+                                                        'Klick Link untuk tindak/informasi lebih lanjut: https://asset.lintasmediadanawa.com/submitted'
                                     mail.send(message)
                                 else:
                                     db.rollback()
-                                    return {'message' : 'Admin ke dua tidak ditemukan'}
+                                    return {'message' : 'Admin ke dua tidak ditemukan', 'Status': 'error'}
                             if fetch_ticketingadmin_2 == email:
                                 lmd.execute('UPDATE ticketingadmin set status = %s where idticket = %s and email = %s', ('1', SelectedTicketingAdmin, email))
                                 db.commit()
@@ -234,16 +234,16 @@ class TicketApprove(Resource):
                                     mail.send(message)
                             lmd.close()
                             db.close()          
-                            return {'message': f'TicketID  {TicketID} Approved'}
+                            return {'message': f'TicketID  {TicketID} Approved', 'Status': 'success'}
                         else:
-                            return {'message': 'Data Invalid'}
+                            return {'message': 'Data Invalid', 'Status': 'error'}
                     else:
-                        return {'message': 'Ticket Invalid'}
+                        return {'message': 'Ticket Invalid', 'Status': 'error'}
                 except Exception as e:
                     db.rollback()
                     error_message = str(e)
                     traceback.print_exc()  # Mencetak pesan kesalahan traceback
-                    return {'message': f'Error: {error_message}'}
+                    return {'message': f'Error: {error_message}', 'Status': 'error'}
 
 class TicketDecline(Resource):
     @check_whitelist
@@ -252,7 +252,7 @@ class TicketDecline(Resource):
         
         token = request.headers.get('Authorization')
         if not token:
-            return {'message': 'Token is missing'}, 401
+            return {'message': 'Token is missing', 'Status': 'error'}, 401
 
         payload = verify_token(token)
 
@@ -273,6 +273,6 @@ class TicketDecline(Resource):
                     lmd.close()
                     db.close()          
                     
-                    return {'message': f'TicketID  {TicketID} has decline'}
+                    return {'message': f'TicketID  {TicketID} has decline', 'Status': 'success'}
                 else:
-                    return {'message': 'Ticket Invalid'}
+                    return {'message': 'Ticket Invalid', 'Status': 'error'}

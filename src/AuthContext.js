@@ -32,6 +32,7 @@ export const AuthProvider = ({ children }) => {
   const [Notification, setNotification] = useState([]);
   const [NotificationStatus, setNotificationStatus] = useState(false);
   const [NotificationInfo, setNotificationInfo] = useState([]);
+  const [LoginNotificationStatus, setLoginNotificationStatus] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -44,7 +45,7 @@ export const AuthProvider = ({ children }) => {
         setEmail(storedEmail); // Set email dari localStorage
         setLoggedIn(true);
         try {
-          const response = await fetch("https://sipanda.online:8443/api/authentication", {
+          const response = await fetch("https://asset.lintasmediadanawa.com:8443/api/authentication", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -92,7 +93,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const refreshAssetData = () => {
-    fetch('https://sipanda.online:8443/api/getdata-listasset')
+    fetch('https://asset.lintasmediadanawa.com:8443/api/getdata-listasset')
       .then((response) => response.json())
       .then((data) => {
         setDataListAsset(data);
@@ -103,7 +104,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const refreshAssetDataExcept = () => {
-    fetch('https://sipanda.online:8443/api/getdata-listassetexcept')
+    fetch('https://asset.lintasmediadanawa.com:8443/api/getdata-listassetexcept')
       .then((response) => response.json())
       .then((data) => {
         setDataListAssetExcept(data);
@@ -114,7 +115,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const refreshStatusList = () => {
-    fetch('https://sipanda.online:8443/api/getdata-statuslist')
+    fetch('https://asset.lintasmediadanawa.com:8443/api/getdata-statuslist')
       .then((response) => response.json())
       .then((data) => {
         setStatusOptions(data);
@@ -125,7 +126,7 @@ export const AuthProvider = ({ children }) => {
   }
 
   const refreshLocationList = () => {
-    fetch('https://sipanda.online:8443/api/getdata-locationlist')
+    fetch('https://asset.lintasmediadanawa.com:8443/api/getdata-locationlist')
       .then((response) => response.json())
       .then((data) => {
         setLocationOptions(data);
@@ -136,7 +137,7 @@ export const AuthProvider = ({ children }) => {
   }
 
   const refreshCategoryList = () => {
-    fetch('https://sipanda.online:8443/api/getdata-categorylist')
+    fetch('https://asset.lintasmediadanawa.com:8443/api/getdata-categorylist')
       .then((response) => response.json())
       .then((data) => {
         setCategoryOptions(data);
@@ -147,7 +148,7 @@ export const AuthProvider = ({ children }) => {
   }
 
   const refreshManageUser = () => {
-    fetch('https://sipanda.online:8443/api/manageuser')
+    fetch('https://asset.lintasmediadanawa.com:8443/api/manageuser')
       .then((response) => response.json())
       .then((data) => {
         setManageUserData(data);
@@ -158,7 +159,7 @@ export const AuthProvider = ({ children }) => {
   }
 
   const refreshAdminList = () => {
-    fetch('https://sipanda.online:8443/api/adminlist')
+    fetch('https://asset.lintasmediadanawa.com:8443/api/adminlist')
       .then((response) => response.json())
       .then((data) => {
         setAdminList(data);
@@ -176,7 +177,7 @@ export const AuthProvider = ({ children }) => {
       }
     };
     
-    fetch('https://sipanda.online:8443/api/leasesubmited', requestOptions)
+    fetch('https://asset.lintasmediadanawa.com:8443/api/leasesubmited', requestOptions)
       .then((response) => response.json())
       .then((data) => {
         setSubmitedList(data);
@@ -187,7 +188,7 @@ export const AuthProvider = ({ children }) => {
   }
 
   const refreshDashboardInfo = () => {
-    fetch('https://sipanda.online:8443/api/DashboardInfo')
+    fetch('https://asset.lintasmediadanawa.com:8443/api/DashboardInfo')
       .then((response) => response.json())
       .then((data) => {
         setDashboardInfo(data);
@@ -207,7 +208,7 @@ export const AuthProvider = ({ children }) => {
       }
     };
     
-    fetch('https://sipanda.online:8443/api/dataloan', requestOptions)
+    fetch('https://asset.lintasmediadanawa.com:8443/api/dataloan', requestOptions)
       .then((response) => response.json())
       .then((data) => {
         setDataLoan(data);
@@ -218,7 +219,7 @@ export const AuthProvider = ({ children }) => {
   }
 
   const refreshHistoryTicket = () => {
-    fetch('https://sipanda.online:8443/api/historyticket')
+    fetch('https://asset.lintasmediadanawa.com:8443/api/historyticket')
       .then((response) => response.json())
       .then((data) => {
         setHistoryTicket(data);
@@ -229,7 +230,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const refreshHistoryLoanData = () => {
-    fetch('https://sipanda.online:8443/api/historyloandata')
+    fetch('https://asset.lintasmediadanawa.com:8443/api/historyloandata')
       .then((response) => response.json())
       .then((data) => {
         setHistoryLoanData(data);
@@ -247,7 +248,7 @@ export const AuthProvider = ({ children }) => {
       }
     };
     
-    fetch('https://sipanda.online:8443/api/myreport', requestOptions)
+    fetch('https://asset.lintasmediadanawa.com:8443/api/myreport', requestOptions)
       .then((response) => response.json())
       .then((data) => {
         setMyReport(data);
@@ -261,7 +262,7 @@ export const AuthProvider = ({ children }) => {
   const [isDesktopView, setIsDesktopView] = useState(window.innerWidth > 768);
   
   return (
-    <AuthContext.Provider value={{ token, email, username, loggedIn, login, logout, refreshAssetData, DataListAsset, refreshStatusList, StatusOptions, refreshLocationList, LocationOptions, refreshCategoryList, CategoryOptions, refreshManageUser, ManageUserData, Role, DataListAssetExcept, refreshAssetDataExcept, AdminList, refreshAdminList, SubmitedList, refreshSubmitedList, refreshDashboardInfo, DashboardInfo, onRequest, inLoans, CountinLoans, refreshDataLoan, DataLoan, Roles, refreshHistoryTicket, HistoryTicket, refreshHistoryLoanData, HistoryLoanData, refreshMyReport, MyReport, setNotification, Notification, setNotificationStatus, NotificationStatus, NotificationInfo, setNotificationInfo, openSidebar, setOpenSidebar, }}>
+    <AuthContext.Provider value={{ token, email, username, loggedIn, login, logout, refreshAssetData, DataListAsset, refreshStatusList, StatusOptions, refreshLocationList, LocationOptions, refreshCategoryList, CategoryOptions, refreshManageUser, ManageUserData, Role, DataListAssetExcept, refreshAssetDataExcept, AdminList, refreshAdminList, SubmitedList, refreshSubmitedList, refreshDashboardInfo, DashboardInfo, onRequest, inLoans, CountinLoans, refreshDataLoan, DataLoan, Roles, refreshHistoryTicket, HistoryTicket, refreshHistoryLoanData, HistoryLoanData, refreshMyReport, MyReport, setNotification, Notification, setNotificationStatus, NotificationStatus, NotificationInfo, setNotificationInfo, openSidebar, setOpenSidebar, setLoginNotificationStatus, LoginNotificationStatus, }}>
       {children}
     </AuthContext.Provider>
   );

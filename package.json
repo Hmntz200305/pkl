@@ -42,11 +42,11 @@
     "webrtc-adapter": "^8.2.3"
   },
   "scripts": {
-    "start": "export HTTPS=true&&SSL_CRT_FILE=certificate.crt&&SSL_KEY_FILE=private.key react-scripts start",
-    "build": "react-scripts build",
+    "start": "HTTPS=true SSL_CRT_FILE=/home/my-app/ssl/lmd.crt SSL_KEY_FILE=/home/my-app/ssl/lmd.key react-scripts start",
+    "build": "GENERATE_SOURCEMAP=false react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
-  },
+  },  
   "eslintConfig": {
     "extends": [
       "react-app",

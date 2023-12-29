@@ -2,7 +2,7 @@ import './App.css';
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCameraRetro, faChalkboard,faComputer,faChevronDown,faAnglesLeft, faUserGear,faBook, faUserPlus, faList,faPlus,faPaperPlane,faClockRotateLeft,faHandHolding,faRotateLeft, faThumbsUp, faThumbsDown,  faEnvelope, faUserShield, faUsers} from '@fortawesome/free-solid-svg-icons';
+import { faCameraRetro, faChalkboard,faComputer,faChevronDown,faAnglesLeft, faUserGear,faBook, faUserPlus, faList,faPlus,faPaperPlane,faClockRotateLeft,faHandHolding,faRotateLeft, faThumbsUp, faThumbsDown,  faEnvelope, faUserShield, faUsers, faCamera, faCirclePlus, faBarcode, faTriangleExclamation} from '@fortawesome/free-solid-svg-icons';
 import { faComments, faFileLines } from '@fortawesome/free-regular-svg-icons';
 import lmd from './resources/img/logo.png';
 import profileSA from './resources/profile/superadmin.svg';
@@ -25,10 +25,15 @@ import Notfound from './pages/Notfound';
 import MyReport from './pages/MyReport';
 import QrAdd from './pages/QrAdd';
 import Qrgen from './pages/Qrgen';
+import Qrdesc from './pages/Qrdesc';
+import Qrtable from './pages/Qrtable';
 import Offline from './pages/Offline';
 import Development from './pages/development';
 import Coba from './pages/Coba';
 import Verify from './pages/Verify';
+import ScanAdd from './pages/ScanAdd';
+import ScanLease from './pages/ScanLease';
+import ScanCheck from './pages/ScanCheck';
 import { AuthProvider, useAuth } from './AuthContext';
 import { Bounce,  ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -41,7 +46,7 @@ const Home = () =>  {
   const [openSubmenu, setOpenSubmenu] = useState(0);
   const [isDesktopView, setIsDesktopView] = useState(window.innerWidth > 768);
   const [rotateButton, setRotateButton] = useState(false);
-  const [popoverProfile, setPopoverProfile] = useState(true);
+  const [popoverProfile, setPopoverProfile] = useState(false);
  
   const popoverProfileHandler = {
     onMouseEnter: () => setPopoverProfile(true),
@@ -88,29 +93,54 @@ const Home = () =>  {
     };
   }, []);
 
-  const notify = () => {
-    toast.success("Wow so easy !", {
-      icon: "❤️"
-    })
-    toast.error("Wow so easy !", {
-      icon: "😁"
-    })
-    toast.warning("Wow so easy !", {
-      icon: "😎"
-    })
-  }
 
-  if (NotificationStatus) {
-    setTimeout(() => {
-      setNotificationStatus(false);
-      setNotification('');
-      setNotificationInfo('');
-    }, 4000);
-  } else {
+  useEffect(() => {
+    if (NotificationStatus) {
+      if (NotificationInfo === 'success') {
+        toast.success(
+          <p className='ml-3'>
+            {Notification}
+          </p>,
+        {
+          icon: (
+            <div className='bg-green-500 p-2 rounded-xl flex items-center w-8 h-8 '>
+              <FontAwesomeIcon icon={faThumbsUp} />
+            </div>
+          )
+        });
+      } else if (NotificationInfo === 'error') {
+        toast.error(
+          <p className='ml-3'>
+            {Notification}
+          </p>,          
+        {
+          icon: (
+            <div className='bg-red-500 p-2 rounded-xl flex items-center w-8 h-8 '>
+              <FontAwesomeIcon icon={faThumbsDown} />
+            </div>
+          )
+        });
+      } else if (NotificationInfo === 'warning') {
+        toast.warning(
+          <p className='ml-3'>
+            {Notification}
+          </p>,
+        {
+          icon: (
+            <div className='bg-yellow-700 p-2 rounded-xl flex items-center w-8 h-8'>
+              <FontAwesomeIcon icon={faTriangleExclamation} />
+            </div>
+          )
+        });
+      } else {
+      }
+    } else {
+    }
+
     setNotificationStatus(false);
     setNotification('');
     setNotificationInfo('');
-  }  
+  }, [NotificationStatus, NotificationInfo, Notification]);
 
   const getProfileImage = (Role) => {
     if (Role === 2) {
@@ -124,11 +154,27 @@ const Home = () =>  {
     }
   };
 
+  const getRandomColor = () => {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  }
+
+  useEffect(() => {
+      const dashboardIcons = document.querySelectorAll('.bg-icon');
+      dashboardIcons.forEach((icon) => {
+          icon.style.backgroundColor = getRandomColor();
+      });
+  }, []);
+
   return (
     <Router>
       {/* NAVBAR */}
       {loggedIn ? (
-        <div className={`flex fixed z-[9999] text-white items-center w-full justify-between bg-gray-800 h-[60px] px-7 border-b ${openDrawer ? 'border-[#606060]' : 'border-[#efefef]'}`}>
+        <div className={`flex fixed z-[9998] text-white items-center w-full justify-between bg-gray-800 h-[60px] px-7 border-b ${openDrawer ? 'border-[#606060]' : 'border-[#efefef]'}`}>
           <div className='flex justify-between items-center'>
             <Link to='https://sipanda.online:2096'>
               <div className='logo'>
@@ -146,12 +192,14 @@ const Home = () =>  {
                   handler={setPopoverProfile}
                 >
                   <PopoverHandler {... popoverProfileHandler}>
-                    <Avatar src={getProfileImage(Role)} alt='profile' className='object-contain brightness-0 invert' withBorder={true} color='white' size='sm' />
+                    <div className='flex items-center cursor-default bg-icon rounded-full'>
+                      <Avatar src={getProfileImage(Role)} alt='profile' className='object-contain brightness-0 invert' withBorder={true} color='white' size='sm' />
+                    </div>
                   </PopoverHandler>
                     <div className={`font-semibold ml-1.5 overflow-hidden whitespace-nowrap overflow-ellipsis max-w-[60px] ${isDesktopView ? '' : 'hidden'}`}>
                       {username}
                     </div>
-                  <PopoverContent {... popoverProfileHandler} className='border-none z-[9999] bg-transparent shadow-none'>
+                  <PopoverContent {... popoverProfileHandler} className='border-none z-[9998] bg-transparent shadow-none'>
                     <div className="flex flex-col opacity-90 justify-center shadow-md p-4 rounded-xl bg-gray-900 w-[250px]">
                       <Avatar src={getProfileImage(Role)} alt='profile' className="object-contain brightness-0 invert mx-auto" size='lg' />
                       <div className="space-y-2 text-center divide-y divide-gray-700">
@@ -185,7 +233,7 @@ const Home = () =>  {
                     <div className={`font-semibold ml-1.5 overflow-hidden whitespace-nowrap overflow-ellipsis max-w-[60px] ${isDesktopView ? '' : 'hidden'}`}>
                       {username}
                     </div>
-                  <PopoverContent {... popoverProfileHandler} className='border-none z-[9999] bg-transparent shadow-none'>
+                  <PopoverContent {... popoverProfileHandler} className='border-none z-[9998] bg-transparent shadow-none'>
                     <div className="flex flex-col opacity-90 justify-center shadow-md p-4 rounded-xl bg-gray-900 w-[250px]">
                       <Avatar src={getProfileImage(Role)} alt='profile' className="object-contain brightness-0 invert mx-auto" size='lg' />
                       <div className="space-y-2 text-center divide-y divide-gray-700">
@@ -210,7 +258,6 @@ const Home = () =>  {
             )}
 
           <div>
-            <button onClick={notify}>Notify !</button>
             <ToastContainer
               position="top-right"
               autoClose={3000}
@@ -225,22 +272,6 @@ const Home = () =>  {
               transition={Bounce}
             />
           </div>
-          {NotificationStatus ? (
-            <div className={`notification flex flex-col max-h-screen absolute top-16 right-1 gap-1 ${NotificationStatus ? 'slide-in' : 'slide-out'}`}>
-              <div class="flex items-center lg:w-[300px] md:w-[250px] sm:w-[200px] p-4 opacity-90 rounded-lg shadow bg-gray-900">
-                {NotificationInfo === 'Error' ? (
-                  <div class="flex bg-red-500 items-center justify-center flex-shrink-0 w-8 h-8 text-white rounded-lg">
-                    <FontAwesomeIcon icon={faThumbsDown} />
-                  </div>
-                ) : (
-                  <div class="flex bg-green-500 items-center justify-center flex-shrink-0 w-8 h-8 text-white rounded-lg">
-                    <FontAwesomeIcon icon={faThumbsUp} />
-                  </div>
-                )}
-                <div class="ml-3 text-left text-sm font-normal break-all text-white">{Notification}</div>
-              </div>
-            </div>
-          ) : null }
         </div>
       </div>
       ) : null }
@@ -288,7 +319,7 @@ const Home = () =>  {
                 </ListItem>
               </Link>
               {/* CHAT */}
-              <Link to='/chat'>
+              {/* <Link to='/chat'>
                 <ListItem className='px-4 text-white hover:bg-[#323b49] hover:text-white focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
                   <ListItemPrefix className='mr-3 w-6 h-6'>
                     <FontAwesomeIcon icon={faComments} />
@@ -300,7 +331,7 @@ const Home = () =>  {
                     <Chip value="14" size="sm" variant="white" color="blue-gray" className="rounded-full" />
                   </ListItemSuffix>
                 </ListItem>
-              </Link>
+              </Link> */}
               {/* ASSET */}
               <Accordion
                 open={openSubmenu === 1}
@@ -340,36 +371,6 @@ const Home = () =>  {
                         </ListItem>
                       </Link>
                     ) : null}
-                    {Role === 2 || Role === 1 ? (
-                      <Link to='/test'>
-                        <ListItem className='px-4 text-white hover:bg-[#374151] hover:text-white hover:rounded-none focus:rounded-none focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
-                          <ListItemPrefix className='mr-3 w-6 h-6'>
-                            <FontAwesomeIcon icon={faCameraRetro} />
-                          </ListItemPrefix>
-                          Scan TEST
-                        </ListItem>
-                      </Link>
-                    ) : null}
-                    {Role === 2 || Role === 1 ? (
-                      <Link to='/qrgen'>
-                        <ListItem className='px-4 text-white hover:bg-[#374151] hover:text-white hover:rounded-none focus:rounded-none focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
-                          <ListItemPrefix className='mr-3 w-6 h-6'>
-                            <FontAwesomeIcon icon={faCameraRetro} />
-                          </ListItemPrefix>
-                          Scan QRGEN
-                        </ListItem>
-                      </Link>
-                    ) : null}
-                     {Role === 2 || Role === 2 ? (
-                      <Link to='/dev'>
-                        <ListItem className='px-4 text-white hover:bg-[#374151] hover:text-white hover:rounded-none focus:rounded-none focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
-                          <ListItemPrefix className='mr-3 w-6 h-6'>
-                            <FontAwesomeIcon icon={faCameraRetro} />
-                          </ListItemPrefix>
-                          Dev
-                        </ListItem>
-                      </Link>
-                    ) : null}
                     {loggedIn ? (
                       <Link to='/lease'>
                         <ListItem className='px-4 text-white hover:bg-[#374151] hover:text-white hover:rounded-none focus:rounded-none focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
@@ -403,7 +404,7 @@ const Home = () =>  {
                   </List>
                 </AccordionBody>
               </Accordion>
-              {/* REPORT */}
+              {/* SCAN */}
               <Accordion
                 open={openSubmenu === 2}
                 icon={
@@ -414,6 +415,56 @@ const Home = () =>  {
               >
                 <ListItem className="p-0 px-1 hover:bg-[#323b49] active:bg-gray-600 focus:bg-gray-800 bg-gray-800" selected={openSubmenu === 2}>
                   <AccordionHeader onClick={() => handleOpenSubmenu(2)} className="border-b-0 p-3 bg-none text-white hover:text-white">
+                    <ListItemPrefix className='mr-3 w-6 h-6'>
+                      <FontAwesomeIcon icon={faCameraRetro} size='sm' />
+                    </ListItemPrefix>
+                    <Typography color="white" className="mr-auto font-normal">
+                      Scan
+                    </Typography>
+                  </AccordionHeader>
+                </ListItem>
+                <AccordionBody className="p-0 bg-gray-600">
+                  <List className="p-0 gap-0">
+                    {Role === 2 || Role === 1 ? (
+                      <Link to='/scanadd'>
+                        <ListItem className='px-4 text-white hover:bg-[#374151] hover:text-white hover:rounded-none focus:rounded-none focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
+                          <ListItemPrefix className='mr-3 w-6 h-6'>
+                            <FontAwesomeIcon icon={faCirclePlus}/>
+                          </ListItemPrefix>
+                          Scan Add
+                        </ListItem>
+                      </Link>
+                    ) : null}
+                    <Link to='/scanlease'>
+                      <ListItem className='px-4 text-white hover:bg-[#374151] hover:text-white hover:rounded-none focus:rounded-none focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
+                        <ListItemPrefix className='mr-3 w-6 h-6'>
+                          <FontAwesomeIcon icon={faBarcode} />
+                        </ListItemPrefix>
+                        Scan Lease
+                      </ListItem>
+                    </Link>
+                    <Link to='/scancheck'>
+                      <ListItem className='px-4 text-white hover:bg-[#374151] hover:text-white hover:rounded-none focus:rounded-none focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
+                        <ListItemPrefix className='mr-3 w-6 h-6'>
+                          <FontAwesomeIcon icon={faCamera} />
+                        </ListItemPrefix>
+                        Scan Check
+                      </ListItem>
+                    </Link>
+                  </List>
+                </AccordionBody>
+              </Accordion>
+              {/* REPORT */}
+              <Accordion
+                open={openSubmenu === 3}
+                icon={
+                  <FontAwesomeIcon icon={faChevronDown} size=''
+                    className={`mx-auto items-center flex h-3 w-4 transition-transform ${openSubmenu === 3 ? "rotate-180" : ""}`}
+                  />
+                }
+              >
+                <ListItem className="p-0 px-1 hover:bg-[#323b49] active:bg-gray-600 focus:bg-gray-800 bg-gray-800" selected={openSubmenu === 3}>
+                  <AccordionHeader onClick={() => handleOpenSubmenu(3)} className="border-b-0 p-3 bg-none text-white hover:text-white">
                     <ListItemPrefix className='mr-3 w-6 h-6'>
                       <FontAwesomeIcon icon={faBook} size='sm' />
                     </ListItemPrefix>
@@ -447,15 +498,15 @@ const Home = () =>  {
               </Accordion>
               {/* MANAGE USER */}
               <Accordion
-                open={openSubmenu === 3}
+                open={openSubmenu === 4}
                 icon={
                   <FontAwesomeIcon icon={faChevronDown}
-                    className={`mx-auto items-center flex h-3 w-4 transition-transform ${openSubmenu === 3 ? "rotate-180" : ""}`}
+                    className={`mx-auto items-center flex h-3 w-4 transition-transform ${openSubmenu === 4 ? "rotate-180" : ""}`}
                   />
                 }
               >
-                <ListItem className="p-0 px-1 hover:bg-[#323b49] active:bg-gray-600 focus:bg-gray-800 bg-gray-800" selected={openSubmenu === 2}>
-                  <AccordionHeader onClick={() => handleOpenSubmenu(3)} className="border-b-0 p-3 bg-none text-white hover:text-white">
+                <ListItem className="p-0 px-1 hover:bg-[#323b49] active:bg-gray-600 focus:bg-gray-800 bg-gray-800" selected={openSubmenu === 4}>
+                  <AccordionHeader onClick={() => handleOpenSubmenu(4)} className="border-b-0 p-3 bg-none text-white hover:text-white">
                     <ListItemPrefix className='mr-3 w-6 h-6'>
                       <FontAwesomeIcon icon={faUserGear} size='sm' />
                     </ListItemPrefix>
@@ -488,7 +539,7 @@ const Home = () =>  {
                 </AccordionBody>
               </Accordion>
               {/* MANAGE USER */}
-              {Role === 2 && (
+              {/* {Role === 2 && (
                 <Link to='manageuser'>
                   <ListItem className='px-4 text-white hover:bg-[#323b49] hover:text-white focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
                     <ListItemPrefix className='mr-3 w-6 h-6'>
@@ -499,7 +550,7 @@ const Home = () =>  {
                     </Typography>
                   </ListItem>
                 </Link>
-              )}
+              )} */}
               {loggedIn && (
                 <Link to='/Login'>
                   <ListItem onClick={logout} className=' py-2 mt-4 flex justify-center items-center text-sm text-white bg-gray-600 hover:text-white hover:bg-[#323b49] focus:text-white focus:bg-gray-600 active:bg-gray-600 active:text-white'>
@@ -553,7 +604,7 @@ const Home = () =>  {
                 </ListItem>
               </Link>
               {/* CHAT */}
-              <Link to='/chat'>
+              {/* <Link to='/chat'>
                 <ListItem className='px-4 text-white hover:bg-[#323b49] hover:text-white focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
                   <ListItemPrefix className='mr-3 w-6 h-6'>
                     <FontAwesomeIcon icon={faComments} />
@@ -565,7 +616,7 @@ const Home = () =>  {
                     <Chip value="14" size="sm" variant="white" color="blue-gray" className="rounded-full" />
                   </ListItemSuffix>
                 </ListItem>
-              </Link>
+              </Link> */}
               {/* ASSET */}
               <Accordion
                 open={openSubmenu === 1}
@@ -578,7 +629,7 @@ const Home = () =>  {
                 <ListItem className="p-0 px-1 hover:bg-[#323b49] active:bg-gray-600 focus:bg-gray-800 bg-gray-800" selected={openSubmenu === 1}>
                   <AccordionHeader onClick={() => handleOpenSubmenu(1)} className="border-b-0 p-3 bg-none text-white hover:text-white">
                     <ListItemPrefix className='mr-3 w-6 h-6'>
-                      <FontAwesomeIcon icon={faComputer} />
+                      <FontAwesomeIcon icon={faComputer} size='sm' />
                     </ListItemPrefix>
                     <Typography color="white" className="mr-auto font-normal">
                       Assets
@@ -602,26 +653,6 @@ const Home = () =>  {
                             <FontAwesomeIcon icon={faPlus} />
                           </ListItemPrefix>
                           Add an Asset
-                        </ListItem>
-                      </Link>
-                    ) : null}
-                    {Role === 2 || Role === 1 ? (
-                      <Link to='/test'>
-                        <ListItem className='px-4 text-white hover:bg-[#374151] hover:text-white hover:rounded-none focus:rounded-none focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
-                          <ListItemPrefix className='mr-3 w-6 h-6'>
-                            <FontAwesomeIcon icon={faCameraRetro} />
-                          </ListItemPrefix>
-                          Scan TEST
-                        </ListItem>
-                      </Link>
-                    ) : null}
-                    {Role === 2 || Role === 1 ? (
-                      <Link to='/qrgen'>
-                        <ListItem className='px-4 text-white hover:bg-[#374151] hover:text-white hover:rounded-none focus:rounded-none focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
-                          <ListItemPrefix className='mr-3 w-6 h-6'>
-                            <FontAwesomeIcon icon={faCameraRetro} />
-                          </ListItemPrefix>
-                          Scan QRGEN
                         </ListItem>
                       </Link>
                     ) : null}
@@ -658,19 +689,69 @@ const Home = () =>  {
                   </List>
                 </AccordionBody>
               </Accordion>
-              {/* REPORT */}
+              {/* SCAN */}
               <Accordion
                 open={openSubmenu === 2}
                 icon={
                   <FontAwesomeIcon icon={faChevronDown} size=''
-                    className={`mx-auto items-center flex h-3 w-4 transition-transform ${openSubmenu === 1 ? "rotate-180" : ""}`}
+                    className={`mx-auto items-center flex h-3 w-4 transition-transform ${openSubmenu === 2 ? "rotate-180" : ""}`}
                   />
                 }
               >
                 <ListItem className="p-0 px-1 hover:bg-[#323b49] active:bg-gray-600 focus:bg-gray-800 bg-gray-800" selected={openSubmenu === 2}>
                   <AccordionHeader onClick={() => handleOpenSubmenu(2)} className="border-b-0 p-3 bg-none text-white hover:text-white">
                     <ListItemPrefix className='mr-3 w-6 h-6'>
-                      <FontAwesomeIcon icon={faBook} />
+                      <FontAwesomeIcon icon={faCameraRetro} size='sm' />
+                    </ListItemPrefix>
+                    <Typography color="white" className="mr-auto font-normal">
+                      Scan
+                    </Typography>
+                  </AccordionHeader>
+                </ListItem>
+                <AccordionBody className="p-0 bg-gray-600">
+                  <List className="p-0 gap-0">
+                    {Role === 2 || Role === 1 ? (
+                      <Link to='/scanadd'>
+                        <ListItem className='px-4 text-white hover:bg-[#374151] hover:text-white hover:rounded-none focus:rounded-none focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
+                          <ListItemPrefix className='mr-3 w-6 h-6'>
+                            <FontAwesomeIcon icon={faCirclePlus}/>
+                          </ListItemPrefix>
+                          Scan Add
+                        </ListItem>
+                      </Link>
+                    ) : null}
+                    <Link to='/scanlease'>
+                      <ListItem className='px-4 text-white hover:bg-[#374151] hover:text-white hover:rounded-none focus:rounded-none focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
+                        <ListItemPrefix className='mr-3 w-6 h-6'>
+                          <FontAwesomeIcon icon={faBarcode} />
+                        </ListItemPrefix>
+                        Scan Lease
+                      </ListItem>
+                    </Link>
+                    <Link to='/scancheck'>
+                      <ListItem className='px-4 text-white hover:bg-[#374151] hover:text-white hover:rounded-none focus:rounded-none focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
+                        <ListItemPrefix className='mr-3 w-6 h-6'>
+                          <FontAwesomeIcon icon={faCamera} />
+                        </ListItemPrefix>
+                        Scan Check
+                      </ListItem>
+                    </Link>
+                  </List>
+                </AccordionBody>
+              </Accordion>
+              {/* REPORT */}
+              <Accordion
+                open={openSubmenu === 3}
+                icon={
+                  <FontAwesomeIcon icon={faChevronDown} size=''
+                    className={`mx-auto items-center flex h-3 w-4 transition-transform ${openSubmenu === 3 ? "rotate-180" : ""}`}
+                  />
+                }
+              >
+                <ListItem className="p-0 px-1 hover:bg-[#323b49] active:bg-gray-600 focus:bg-gray-800 bg-gray-800" selected={openSubmenu === 3}>
+                  <AccordionHeader onClick={() => handleOpenSubmenu(3)} className="border-b-0 p-3 bg-none text-white hover:text-white">
+                    <ListItemPrefix className='mr-3 w-6 h-6'>
+                      <FontAwesomeIcon icon={faBook} size='sm' />
                     </ListItemPrefix>
                     <Typography color="white" className="mr-auto font-normal">
                       Reports
@@ -689,7 +770,7 @@ const Home = () =>  {
                         </ListItem>
                       </Link>
                     ) : null}
-                    <Link to='/myreport'>
+                    <Link to='myreport'>
                       <ListItem className='px-4 text-white hover:bg-[#374151] hover:text-white hover:rounded-none focus:rounded-none focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
                         <ListItemPrefix className='mr-3 w-6 h-6'>
                           <FontAwesomeIcon icon={faFileLines} />
@@ -702,15 +783,15 @@ const Home = () =>  {
               </Accordion>
               {/* MANAGE USER */}
               <Accordion
-                open={openSubmenu === 3}
+                open={openSubmenu === 4}
                 icon={
                   <FontAwesomeIcon icon={faChevronDown}
-                    className={`mx-auto items-center flex h-3 w-4 transition-transform ${openSubmenu === 3 ? "rotate-180" : ""}`}
+                    className={`mx-auto items-center flex h-3 w-4 transition-transform ${openSubmenu === 4 ? "rotate-180" : ""}`}
                   />
                 }
               >
-                <ListItem className="p-0 px-1 hover:bg-[#323b49] active:bg-gray-600 focus:bg-gray-800 bg-gray-800" selected={openSubmenu === 2}>
-                  <AccordionHeader onClick={() => handleOpenSubmenu(3)} className="border-b-0 p-3 bg-none text-white hover:text-white">
+                <ListItem className="p-0 px-1 hover:bg-[#323b49] active:bg-gray-600 focus:bg-gray-800 bg-gray-800" selected={openSubmenu === 4}>
+                  <AccordionHeader onClick={() => handleOpenSubmenu(4)} className="border-b-0 p-3 bg-none text-white hover:text-white">
                     <ListItemPrefix className='mr-3 w-6 h-6'>
                       <FontAwesomeIcon icon={faUserGear} size='sm' />
                     </ListItemPrefix>
@@ -743,7 +824,7 @@ const Home = () =>  {
                 </AccordionBody>
               </Accordion>
               {/* MANAGE USER */}
-              {Role === 2 && (
+              {/* {Role === 2 && (
                 <Link to='manageuser'>
                   <ListItem className='px-4 text-white hover:bg-[#323b49] hover:text-white focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
                     <ListItemPrefix className='mr-3 w-6 h-6'>
@@ -754,7 +835,7 @@ const Home = () =>  {
                     </Typography>
                   </ListItem>
                 </Link>
-              )}
+              )} */}
               {loggedIn && (
                 <Link to='/Login'>
                   <ListItem onClick={logout} className=' py-2 mt-4 flex justify-center items-center text-sm text-white bg-gray-600 hover:text-white hover:bg-[#323b49] focus:text-white focus:bg-gray-600 active:bg-gray-600 active:text-white'>
@@ -811,12 +892,17 @@ const Home = () =>  {
             <Route path="*" element={<Notfound />} />
             <Route path="/qradd" element={<QrAdd />} />
             <Route path="/qrgen" element={<Qrgen />} />
+            <Route path="/qrdesc" element={<Qrdesc />} />
+            <Route path="/qrtable" element={<Qrtable />} />
             <Route path="/offline" element={<Offline />} />
             <Route path="/dev" element={<Development />} />
             <Route path="/coba" element ={<Coba />}  />
             <Route path="/adduser" element ={<AddUser />}  />
             <Route path="/listuser" element ={<ListUser />}  />
             <Route path="/verify/:token" element ={<Verify />}  />
+            <Route path="/scanadd" element ={<ScanAdd />}  />
+            <Route path="/scanlease" element ={<ScanLease />}  />
+            <Route path="/scancheck" element ={<ScanCheck />}  />
             </Routes>
         </div>
       </div>

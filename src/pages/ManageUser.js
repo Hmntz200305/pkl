@@ -257,7 +257,7 @@ const ManageUser = () => {
             password: password
         };
         try {
-            const response = await fetch(`https://sipanda.online:8443/api/edit-user/${selectedUser.no}`, {
+            const response = await fetch(`https://asset.lintasmediadanawa.com:8443/api/edit-user/${selectedUser.no}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -283,7 +283,7 @@ const ManageUser = () => {
 
     const deleteUser = async (no) => {
         try {
-          const response = await fetch(`https://sipanda.online:8443/api/delete-user/${no}`, {
+          const response = await fetch(`https://asset.lintasmediadanawa.com:8443/api/delete-user/${no}`, {
             method: 'DELETE',
             headers: {
               'Content-Type': 'application/json',

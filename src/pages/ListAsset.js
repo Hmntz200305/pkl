@@ -158,7 +158,7 @@ const ListAsset = () => {
       formData.append('csvFile', selectedFile);
     
       try {
-        const response = await fetch('https://sipanda.online:8443/api/importcsv', {
+        const response = await fetch('https://asset.lintasmediadanawa.com:8443/api/importcsv', {
           method: 'POST',
           body: formData,
         });
@@ -191,7 +191,7 @@ const ListAsset = () => {
 
 
     const handleDownload = () => {
-      const fileURL = 'https://sipanda.online:8443/static/template/MyReport.csv'; // Gantilah dengan URL file yang sesuai
+      const fileURL = 'https://asset.lintasmediadanawa.com:8443/static/template/MyReport.csv'; // Gantilah dengan URL file yang sesuai
       const a = document.createElement('a');
       a.href = fileURL;
       a.download = 'MyReport.csv'; // Gantilah dengan nama file yang sesuai
@@ -339,7 +339,7 @@ const ListAsset = () => {
     }
 
     try {
-      const response = await fetch(`https://sipanda.online:8443/api/edit-asset/${selectedAsset.no}`, {
+      const response = await fetch(`https://asset.lintasmediadanawa.com:8443/api/edit-asset/${selectedAsset.no}`, {
         method: 'PUT',
         headers: {
           Authorization: token,
@@ -351,13 +351,14 @@ const ListAsset = () => {
         const data = await response.json();
         setNotification(data.message);
         setNotificationStatus(true);
+        setNotificationInfo(data.Status);
         setModalEdit(false);
         refreshAssetData();
       } else {
         const data = await response.json();
         setNotification(data.message);
         setNotificationStatus(true);
-        setNotificationInfo('Error');
+        setNotificationInfo(data.Status);
       }
     } catch (error) {
       console.error('Error:', error);
@@ -366,7 +367,7 @@ const ListAsset = () => {
     
   const deleteAsset = async (id) => {
     try {
-      const response = await fetch(`https://sipanda.online:8443//api/delete-asset/${id}`, {
+      const response = await fetch(`https://asset.lintasmediadanawa.com:8443/api/delete-asset/${id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -377,13 +378,14 @@ const ListAsset = () => {
         const data = await response.json();
         setNotification(data.message);
         setNotificationStatus(true);
+        setNotificationInfo(data.Status);
         setModalDelete(false);
         refreshAssetData();
       } else {
         const data = await response.json();
         setNotification(data.message);
         setNotificationStatus(true);
-        setNotificationInfo('Error');
+        setNotificationInfo(data.Status);
       } 
     } catch (error) {
       console.error('Error:', error);
@@ -483,39 +485,41 @@ const ListAsset = () => {
         </div>
       </div>
 
-      <div className='p-2'>
-        <div className='bg-white rounded'>
-            <div className='flex justify-center'>
-                <h1 className="text-2xl font-semibold mt-6">Select Action</h1>
-            </div>
-            <Tabs value={activeTab} className='p-2'>
-                <TabsHeader className="rounded-none p-0 border-b border-blue-gray-50 mt-4 bg-white"
-                    indicatorProps={{
-                        className:
-                        "bg-transparent border-b-2 border-gray-900 shadow-none rounded-none",
-                    }}
-                >
-                    {data.map(({ label, value }) => (
-                        <Tab
-                        key={value}
-                        value={value}
-                        onClick={() => setActiveTab(value)}
-                        className={activeTab === value ? "text-gray-800" : "hover:text-gray-500"}
-                        >
-                        {label}
-                        </Tab>
-                    ))}
-                </TabsHeader>
-                <TabsBody>
-                    {data.map(({ value, content }) => (
-                        <TabPanel key={value} value={value}>
-                        {content}
-                        </TabPanel>
-                    ))}
-                </TabsBody>
-            </Tabs>
+      {Role === 2 || Role === 1 ? (
+        <div className='p-2'>
+          <div className='bg-white rounded'>
+              <div className='flex justify-center'>
+                  <h1 className="text-2xl font-semibold mt-6">Select Action</h1>
+              </div>
+              <Tabs value={activeTab} className='p-2'>
+                  <TabsHeader className="rounded-none p-0 border-b border-blue-gray-50 mt-4 bg-white"
+                      indicatorProps={{
+                          className:
+                          "bg-transparent border-b-2 border-gray-900 shadow-none rounded-none",
+                      }}
+                  >
+                      {data.map(({ label, value }) => (
+                          <Tab
+                          key={value}
+                          value={value}
+                          onClick={() => setActiveTab(value)}
+                          className={activeTab === value ? "text-gray-800" : "hover:text-gray-500"}
+                          >
+                          {label}
+                          </Tab>
+                      ))}
+                  </TabsHeader>
+                  <TabsBody>
+                      {data.map(({ value, content }) => (
+                          <TabPanel key={value} value={value}>
+                          {content}
+                          </TabPanel>
+                      ))}
+                  </TabsBody>
+              </Tabs>
+          </div>
         </div>
-      </div>
+      ) : null}
       
       {isDesktopView && (
         <Modal

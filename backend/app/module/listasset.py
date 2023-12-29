@@ -55,7 +55,7 @@ class EditAsset(Resource):
 
         token = request.headers.get('Authorization')
         if not token:
-            return {'message': 'Token is missing'}, 401
+            return {'message': 'Token is missing', 'Status': 'error'}, 401
         
         payload = verify_token(token)
         if payload:
@@ -82,7 +82,7 @@ class EditAsset(Resource):
                         file = request.files.get('addAssetImage')
                         
                         if not validate_editasset(ids, name, description, brand, model, status, location, category, sn):
-                            return {"message": "Data is incomplete"}, 400
+                            return {"message": "Data is incomplete", 'Status': 'warning'}, 400
                         
                         if file:
                             original_filename = secure_filename(file.filename)
@@ -91,7 +91,7 @@ class EditAsset(Resource):
                             save_path = os.path.join(current_app.config['UPLOAD_FOLDER'], ids)
                             os.makedirs(save_path, exist_ok=True)
                             file.save(os.path.join(save_path, filename))
-                            image_path = ('https://sipanda.online:8443/static/upload/' + ids + '/' + filename)
+                            image_path = ('https://asset.lintasmediadanawa.com:8443/static/upload/' + ids + '/' + filename)
                             lmd.execute("UPDATE assets set asset = %s, name = %s, description = %s, brand = %s, model = %s, status = %s, location = %s, category = %s, serialnumber = %s, photo = %s where id = %s", (ids, name, description, brand, model, status, location, category, sn, image_path, idasset))
                             db.commit()
                             lmd.close()
@@ -99,13 +99,13 @@ class EditAsset(Resource):
                             lmd.execute("UPDATE assets set asset = %s, name = %s, description = %s, brand = %s, model = %s, status = %s, location = %s, category = %s, serialnumber = %s where id = %s", (ids, name, description, brand, model, status, location, category, sn, idasset))
                             db.commit()
                             lmd.close()
-                        return {'message': f"Asset with ID {ids} has been updated."}, 200
+                        return {'message': f"Asset with ID {ids} has been updated.", "Status": 'success'}, 200
                     else:
                         # Aset tidak ditemukan, berikan pesan kesalahan
                         lmd.close()
-                        return {"message": f"Asset with ID {ids} not found."}, 404
+                        return {"message": f"Asset with ID {ids} not found.", "Status": "error"}, 404
                 else:
-                    return{"message": "you didnt have access to run this command"}
+                    return{"message": "you didnt have access to run this command", "Status": "error"}
 
 class DeleteAsset(Resource):
     @check_whitelist
@@ -127,11 +127,11 @@ class DeleteAsset(Resource):
                 print(f"Error: {e}")
             db.commit()
             lmd.close()
-            return {'message': "Asset with ID {} has been deleted.".format(existing_asset)}, 200
+            return {'message': "Asset with ID {} has been deleted.".format(existing_asset), "Status": "success"}, 200
         else:
             # Aset tidak ditemukan, berikan pesan kesalahan
             lmd.close()
-            return {'message': "Asset with ID {} not found.".format(existing_asset)}, 404
+            return {'message': "Asset with ID {} not found.".format(existing_asset), "Status": "error"}, 404
         
 class StatusList(Resource):
     @check_whitelist

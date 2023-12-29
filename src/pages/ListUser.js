@@ -10,7 +10,7 @@ import { useAuth } from '../AuthContext';
 
 const ListUser = () => {
 
-    const { token, Role, refreshManageUser, ManageUserData, setNotification, setNotificationStatus, openSidebar, setOpenSidebar } = useAuth();
+    const { token, Role, refreshManageUser, ManageUserData, setNotification, setNotificationStatus, openSidebar, setOpenSidebar, setNotificationInfo } = useAuth();
     const [showEdit, setShowEdit] = useState(false);
     const [showDelete, setShowDelete] = useState(false);
     const [username, setUsername] = useState("");
@@ -23,6 +23,7 @@ const ListUser = () => {
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
     const isMobile = windowWidth <= 768;
     const [isDesktopView, setIsDesktopView] = useState(window.innerWidth > 768);
+    // eslint-disable-next-line
 
     const handleResizeMobile = () => {
         setIsDesktopView(window.innerWidth > 768);
@@ -96,7 +97,7 @@ const ListUser = () => {
             password: password
         };
         try {
-            const response = await fetch(`https://sipanda.online:8443/api/edit-user/${selectedUser.no}`, {
+            const response = await fetch(`https://asset.lintasmediadanawa.com:8443/api/edit-user/${selectedUser.no}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -109,11 +110,13 @@ const ListUser = () => {
                 const data = await response.json();
                 setNotification(data.message);
                 setNotificationStatus(true);
+                setNotificationInfo(data.Status);
                 setShowEdit(false);
                 refreshManageUser();
             } else {
                 setNotification('Failed to edit user');
                 setNotificationStatus(true);
+                setNotificationInfo("error");
             }
         } catch (error) {
             console.error('Error:', error);
@@ -122,7 +125,7 @@ const ListUser = () => {
 
     const deleteUser = async (no) => {
         try {
-          const response = await fetch(`https://sipanda.online:8443/api/delete-user/${no}`, {
+          const response = await fetch(`https://asset.lintasmediadanawa.com:8443/api/delete-user/${no}`, {
             method: 'DELETE',
             headers: {
               'Content-Type': 'application/json',
@@ -133,11 +136,13 @@ const ListUser = () => {
             const data = await response.json();
             setNotification(data.message);
             setNotificationStatus(true);
+            setNotificationInfo(data.Status);
             setShowDelete(false);
             refreshManageUser();
           } else {
             setNotification('Failed to delete user');
             setNotificationStatus(true);
+            setNotificationInfo("error");
           }
         } catch (error) {
           console.error('Error:', error);

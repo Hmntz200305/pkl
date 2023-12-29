@@ -7,7 +7,7 @@ import { useAuth } from '../AuthContext';
 
 const AddUser = () => {
 
-    const { token, Role, refreshManageUser, setNotification, setNotificationStatus } = useAuth();
+    const { token, Role, refreshManageUser, setNotification, setNotificationStatus, setNotificationInfo } = useAuth();
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -51,7 +51,7 @@ const AddUser = () => {
 
         try {
           setIsLoading(true);
-          const response = await fetch("https://sipanda.online:8443/api/register", {
+          const response = await fetch("https://asset.lintasmediadanawa.com:8443/api/register", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -64,13 +64,17 @@ const AddUser = () => {
             const data = await response.json();
             setNotification(data.message);
             setNotificationStatus(true);
+            setNotificationInfo(data.Status);
             setUsername('');
             refreshManageUser();
             setEmail('');
             setPassword('');
             setRoles('0');
           } else {
-            console.log("unauthorized.");
+            const data = await response.json();
+            setNotification(data.message);
+            setNotificationStatus(true);
+            setNotificationInfo(data.Status);
           }
         } catch (error) {
           console.error("Error:", error);

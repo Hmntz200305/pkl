@@ -118,7 +118,7 @@ const AddAsset = () => {
 
     const handleAddAsset = async (token) => {
       try {
-        setIsLoading(true); // Atur status loading menjadi true
+        setIsLoading(true);
         const formData = new FormData();
 
         formData.append('addAssetID', addAssetID);
@@ -135,7 +135,7 @@ const AddAsset = () => {
           formData.append('addAssetImage', fileInput); 
         }
 
-        const response = await fetch("https://sipanda.online:8443/api/addasset", {
+        const response = await fetch("https://asset.lintasmediadanawa.com:8443/api/addasset", {
           method: "POST",
           headers: {
             Authorization: token,
@@ -147,6 +147,7 @@ const AddAsset = () => {
           const data = await response.json();
           setNotification(data.message);
           setNotificationStatus(true);
+          setNotificationInfo(data.Status);
           refreshAssetData();
           setaddAssetID('');
           setaddAssetName('');
@@ -163,7 +164,7 @@ const AddAsset = () => {
           const data = await response.json();
           setNotification(data.message);
           setNotificationStatus(true);
-          setNotificationInfo('Error');
+          setNotificationInfo(data.Status);
         }
       } catch (error) {
         console.error("Error:", error);
@@ -175,7 +176,7 @@ const AddAsset = () => {
 
     const handleNewStatus = async (token) => {
       try {
-        const response = await fetch("https://sipanda.online:8443/api/addstatus", {
+        const response = await fetch("https://asset.lintasmediadanawa.com:8443/api/addstatus", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -188,13 +189,14 @@ const AddAsset = () => {
           const data = await response.json();
           setNotification(data.message);
           setNotificationStatus(true);
+          setNotificationInfo(data.Status);
           refreshStatusList();
           setnewStatus('');
         } else {
           const data = await response.json();
           setNotification(data.message);
           setNotificationStatus(true);
-          setNotificationInfo('Error');
+          setNotificationInfo(data.Status);
         }
       } catch (error) {
         console.error("Error:", error);
@@ -203,7 +205,7 @@ const AddAsset = () => {
 
     const handleNewLocation = async (token) => {
       try {
-        const response = await fetch("https://sipanda.online:8443/api/addlocation", {
+        const response = await fetch("https://asset.lintasmediadanawa.com:8443/api/addlocation", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -216,13 +218,14 @@ const AddAsset = () => {
           const data = await response.json();
           setNotification(data.message);
           setNotificationStatus(true);
+          setNotificationInfo(data.Status);
           refreshLocationList();
           setnewLocation('');
         } else {
           const data = await response.json();
           setNotification(data.message);
           setNotificationStatus(true);
-          setNotificationInfo('Error');
+          setNotificationInfo(data.Status);
         }
       } catch (error) {
         console.error("Error:", error);
@@ -231,7 +234,7 @@ const AddAsset = () => {
 
     const handleNewCategory = async (token) => {
       try {
-        const response = await fetch("https://sipanda.online:8443/api/addcategory", {
+        const response = await fetch("https://asset.lintasmediadanawa.com:8443/api/addcategory", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -244,13 +247,14 @@ const AddAsset = () => {
           const data = await response.json();
           setNotification(data.message);
           setNotificationStatus(true);
+          setNotificationInfo(data.Status);
           refreshCategoryList();
           setnewCategory('');
         } else {
           const data = await response.json();
           setNotification(data.message);
           setNotificationStatus(true);
-          setNotificationInfo('Error');
+          setNotificationInfo(data.Status);
         }
       } catch (error) {
         console.error("Error:", error);

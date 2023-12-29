@@ -102,7 +102,7 @@ const MyReport = () => {
           setIsLoading(true);
     
           const response = await fetch(
-            `https://sipanda.online:8443/api/myreportdelete/${selectedMyReportID}`,
+            `https://asset.lintasmediadanawa.com:8443/api/myreportdelete/${selectedMyReportID}`,
             {
               method: 'PUT',
               headers: {
@@ -203,7 +203,9 @@ const MyReport = () => {
                 <div className='flex flex-col'>
                     <div>
                       {row.admin1status === 'on Request' ? (
-                        <p>Still Submitted...</p>
+                        <p>
+                            <span>{row.admin1}'s Approval Pending</span>
+                        </p>
                       ) : (
                         <div>
                             <p>
@@ -227,7 +229,9 @@ const MyReport = () => {
                 <div className='flex flex-col'>
                     <div>
                       {row.admin2status === 'on Request' ? (
-                        <p>Still Submitted...</p>
+                        <p>
+                            <span>{row.admin2}'s Approval Pending</span>
+                        </p>
                       ) : (
                         <div>
                             <p>
@@ -251,7 +255,7 @@ const MyReport = () => {
                 <div className='flex flex-col'>
                     <div>
                       {row.statusticket === 'on Request' ? (
-                        <p>Still Submitted...</p>
+                        <p>Approval Pending</p>
                       ) : (
                         <div>
                             <p>
@@ -411,16 +415,19 @@ const MyReport = () => {
                 export={false}
                 exportHeaders={false}
                 filterPlaceholder='Filter Data'
-            >
-            <DataTable
-                noHeader
-                defaultSortField='no'
-                defaultSortAsc={false}
-                pagination
-                highlightOnHover
-            />
-            </DataTableExtensions>
-        </div>
+                
+                >
+                <DataTable
+                    noHeader
+                    defaultSortField='no'
+                    defaultSortAsc={false}
+                    pagination
+                    highlightOnHover
+                    paginationRowsPerPageOptions={[5, 10, 20, 50]} // Pilihan jumlah baris per halaman
+                    paginationPerPage={5} // Jumlah baris per halaman default
+                />
+                </DataTableExtensions>
+            </div>
         </>
     )
 }

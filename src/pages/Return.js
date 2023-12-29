@@ -9,7 +9,7 @@ import Modal from 'react-modal';
 Modal.setAppElement('#root');
 
 const Return = () => {
-    const { token, Role, refreshDataLoan, DataLoan, setNotification, setNotificationStatus, openSidebar, setOpenSidebar } = useAuth();
+    const { token, Role, refreshDataLoan, DataLoan, setNotification, setNotificationStatus, setNotificationInfo, openSidebar, setOpenSidebar, } = useAuth();
     const [dataWithRemainingTime, setDataWithRemainingTime] = useState([]);
     const [selectedLoanID, setselectedLoanID] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -95,7 +95,7 @@ const Return = () => {
         try {
           setIsLoading(true); // Atur status loading menjadi true
       
-          const response = await fetch(`https://sipanda.online:8443/api/returnsloan/${selectedLoanID}`, {
+          const response = await fetch(`https://asset.lintasmediadanawa.com:8443/api/returnsloan/${selectedLoanID}`, {
             method: "POST",
             headers: {
               Authorization: token,
@@ -106,11 +106,13 @@ const Return = () => {
             const data = await response.json();
             setNotification(data.message);
             setNotificationStatus(true);
+            setNotificationInfo(data.Status);
             await refreshDataLoan();
             setIsLoading(false); // Atur status loading menjadi false
           } else {
             setNotification('Failed return');
             setNotificationStatus(true);
+            setNotificationInfo("error");
             setIsLoading(false); // Atur status loading menjadi false
           }
         } catch (error) {
