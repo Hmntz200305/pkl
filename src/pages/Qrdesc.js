@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { QrReader } from 'react-qr-reader';
+import {QrReader} from 'react-qr-reader'
 import DataTable from 'react-data-table-component';
 import './qr.css'
 import 'react-data-table-component-extensions/dist/index.css';

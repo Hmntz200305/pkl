@@ -196,10 +196,28 @@ const ListUser = () => {
             }
     ]
 
+    const getRandomColor = () => {
+        const letters = '0123456789ABCDEF';
+        let color = '#';
+        for (let i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    }
+  
+    useEffect(() => {
+        const dashboardIcons = document.querySelectorAll('.dashboard-icon');
+        dashboardIcons.forEach((icon) => {
+            icon.style.backgroundColor = getRandomColor();
+        });
+    }, []);
+
     return (
         <> 
-            <div className='bg-black rounded-2xl p-4 shadow'>
-                <h2 className='text-white'>Selamat datang di List User page :)</h2>
+            <div className='p-2'>
+                <div className='dashboard-icon mb-5 rounded-2xl p-4 shadow'>
+                    <h2 className='text-white'>Welcome, List of User page :)</h2>
+                </div>
             </div>
 
             <div className='p-2 ' id='data tabel'>

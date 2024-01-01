@@ -10,4 +10,4 @@ from app.module.history import HistoryTicket, HistoryLoanData
 from app.module.myreport import MyReport, MyReportDelete
 from app.module.forgotpassword import ForgotPassword, VerifyEmailForgotPw
 from app.module.imports import UploadCsv
-from app.module.qrcode import QrGenerator, QrScanner
+from app.module.qrcode import QrGenerator, QrScanner, LeaseTicketScanner, QrScannerCheck

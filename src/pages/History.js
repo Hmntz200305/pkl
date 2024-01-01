@@ -70,6 +70,7 @@ const History = () => {
           
             doc.save('mrt-pdf-example.pdf');
         };
+        
 
         return (
             <div className='p-0'>
@@ -518,10 +519,26 @@ const History = () => {
             },
     ]
 
+    const getRandomColor = () => {
+        const letters = '0123456789ABCDEF';
+        let color = '#';
+        for (let i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    }
+  
+    useEffect(() => {
+        const dashboardIcons = document.querySelectorAll('.dashboard-icon');
+        dashboardIcons.forEach((icon) => {
+            icon.style.backgroundColor = getRandomColor();
+        });
+    }, []);
+
     return (
         <>
             <div className='p-2'>
-                <div className='bg-black rounded-2xl p-4 shadow'>
+                <div className='dashboard-icon rounded-2xl p-4 shadow'>
                     <h2 className='text-white'>Selamat datang di History page :)</h2>
                 </div>
             </div>

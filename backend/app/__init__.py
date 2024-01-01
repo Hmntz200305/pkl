@@ -52,6 +52,8 @@ api.add_resource(VerifyEmailForgotPw, '/verifyemailforgotpw/<string:token>')
 api.add_resource(UploadCsv, '/api/importcsv')
 api.add_resource(QrGenerator, '/api/qrgenerator')
 api.add_resource(QrScanner, '/api/qrscanner')
+api.add_resource(LeaseTicketScanner, '/api/leaseticketscanner')
+api.add_resource(QrScannerCheck, '/api/qrscannercheck')
 
 
 if __name__ == '__main__':

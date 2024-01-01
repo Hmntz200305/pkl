@@ -2,7 +2,7 @@ import './App.css';
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCameraRetro, faChalkboard,faComputer,faChevronDown,faAnglesLeft, faUserGear,faBook, faUserPlus, faList,faPlus,faPaperPlane,faClockRotateLeft,faHandHolding,faRotateLeft, faThumbsUp, faThumbsDown,  faEnvelope, faUserShield, faUsers, faCamera, faCirclePlus, faBarcode, faTriangleExclamation} from '@fortawesome/free-solid-svg-icons';
+import { faCameraRetro, faChalkboard,faComputer,faChevronDown,faAnglesLeft, faUserGear,faBook, faUserPlus, faList,faPlus,faPaperPlane,faClockRotateLeft,faHandHolding,faRotateLeft, faThumbsUp, faThumbsDown,  faEnvelope, faUserShield, faUsers, faCamera, faCirclePlus, faBarcode, faTriangleExclamation, faQrcode} from '@fortawesome/free-solid-svg-icons';
 import { faComments, faFileLines } from '@fortawesome/free-regular-svg-icons';
 import lmd from './resources/img/logo.png';
 import profileSA from './resources/profile/superadmin.svg';
@@ -24,7 +24,7 @@ import Login from './Login';
 import Notfound from './pages/Notfound';
 import MyReport from './pages/MyReport';
 import QrAdd from './pages/QrAdd';
-import Qrgen from './pages/Qrgen';
+import QRGen from './pages/QRGen';
 import Qrdesc from './pages/Qrdesc';
 import Qrtable from './pages/Qrtable';
 import Offline from './pages/Offline';
@@ -258,19 +258,37 @@ const Home = () =>  {
             )}
 
           <div>
-            <ToastContainer
-              position="top-right"
-              autoClose={3000}
-              hideProgressBar={false}
-              newestOnTop={false}
-              closeOnClick
-              rtl={false}
-              pauseOnFocusLoss
-              draggable
-              pauseOnHover
-              theme="dark"
-              transition={Bounce}
-            />
+          {isDesktopView && (
+              <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="dark"
+                transition={Bounce}
+              />
+            )}
+            {!isDesktopView && (
+                <ToastContainer
+                  position="top-left"
+                  autoClose={3000}
+                  hideProgressBar={false}
+                  newestOnTop={false}
+                  closeOnClick
+                  rtl={false}
+                  pauseOnFocusLoss
+                  draggable
+                  pauseOnHover
+                  theme="dark"
+                  transition={Bounce}
+                  style={{width: '250px'}}
+              />
+            )}
           </div>
         </div>
       </div>
@@ -398,6 +416,16 @@ const Home = () =>  {
                             <FontAwesomeIcon icon={faPaperPlane} />
                           </ListItemPrefix>
                           Submitted
+                        </ListItem>
+                      </Link>
+                    ) : null}
+                    {Role === 2 || Role === 1 ? (
+                      <Link to='/qrgen'>
+                        <ListItem className='px-4 text-white hover:bg-[#374151] hover:text-white hover:rounded-none focus:rounded-none focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
+                          <ListItemPrefix className='mr-3 w-6 h-6'>
+                            <FontAwesomeIcon icon={faQrcode} />
+                          </ListItemPrefix>
+                          QR Generator
                         </ListItem>
                       </Link>
                     ) : null}
@@ -686,6 +714,16 @@ const Home = () =>  {
                         </ListItem>
                       </Link>
                     ) : null}
+                    {Role === 2 || Role === 1 ? (
+                      <Link to='/qrgen'>
+                        <ListItem className='px-4 text-white hover:bg-[#374151] hover:text-white hover:rounded-none focus:rounded-none focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
+                          <ListItemPrefix className='mr-3 w-6 h-6'>
+                            <FontAwesomeIcon icon={faQrcode} />
+                          </ListItemPrefix>
+                          QR Generator
+                        </ListItem>
+                      </Link>
+                    ) : null}
                   </List>
                 </AccordionBody>
               </Accordion>
@@ -857,52 +895,52 @@ const Home = () =>  {
                       }}
         >
           <Routes>
-          {loggedIn ? (
-            <Route path="/" element={<Dashboard />} />
-          ) : (
-            <Route path="/" element={<Login />} />
-          )}
-            <Route path="/chat" element={<Chat />} />
-            <Route path="/listasset" element={<ListAsset />} />
-            <Route 
-              path="/addasset" 
-              element={Role === 2 || Role === 1 ? <AddAsset /> : <Dashboard />}
-            />
-            <Route 
-              path="/lease" 
-              element={loggedIn ? <Lease /> : <Login />} />
-            <Route 
-              path="/return" 
-              element={loggedIn ? <Return /> : <Login />} />
-            <Route 
-              path="/submitted" 
-              element={Role === 2 || Role === 1 ? <Submitted /> : <Dashboard />} />
-            <Route 
-              path="/history" 
-              element={Role === 2 || Role === 1 ? <History /> : <Dashboard />} />
-            <Route 
-              path="/manageuser" 
-              element={Role === 2 ? <ManageUser /> : <Dashboard />}
-            />
-            <Route
-              path="/login"
-              element={loggedIn ? <Navigate to="/" /> : <Login />}
-            />  
-            <Route path="/myreport" element={<MyReport />} />
-            <Route path="*" element={<Notfound />} />
-            <Route path="/qradd" element={<QrAdd />} />
-            <Route path="/qrgen" element={<Qrgen />} />
-            <Route path="/qrdesc" element={<Qrdesc />} />
-            <Route path="/qrtable" element={<Qrtable />} />
-            <Route path="/offline" element={<Offline />} />
-            <Route path="/dev" element={<Development />} />
-            <Route path="/coba" element ={<Coba />}  />
-            <Route path="/adduser" element ={<AddUser />}  />
-            <Route path="/listuser" element ={<ListUser />}  />
-            <Route path="/verify/:token" element ={<Verify />}  />
-            <Route path="/scanadd" element ={<ScanAdd />}  />
-            <Route path="/scanlease" element ={<ScanLease />}  />
-            <Route path="/scancheck" element ={<ScanCheck />}  />
+            {loggedIn ? (
+              <Route path="/" element={<Dashboard />} />
+            ) : (
+              <Route path="/" element={<Login />} />
+            )}
+              <Route path="/chat" element={<Chat />} />
+              <Route path="/listasset" element={<ListAsset />} />
+              <Route 
+                path="/addasset" 
+                element={Role === 2 || Role === 1 ? <AddAsset /> : <Dashboard />}
+              />
+              <Route 
+                path="/lease" 
+                element={loggedIn ? <Lease /> : <Login />} />
+              <Route 
+                path="/return" 
+                element={loggedIn ? <Return /> : <Login />} />
+              <Route 
+                path="/submitted" 
+                element={Role === 2 || Role === 1 ? <Submitted /> : <Dashboard />} />
+              <Route 
+                path="/history" 
+                element={Role === 2 || Role === 1 ? <History /> : <Dashboard />} />
+              <Route 
+                path="/manageuser" 
+                element={Role === 2 ? <ManageUser /> : <Dashboard />}
+              />
+              <Route
+                path="/login"
+                element={loggedIn ? <Navigate to="/" /> : <Login />}
+              />  
+              <Route path="/myreport" element={<MyReport />} />
+              <Route path="*" element={<Notfound />} />
+              <Route path="/qradd" element={<QrAdd />} />
+              <Route path="/qrdesc" element={<Qrdesc />} />
+              <Route path="/qrtable" element={<Qrtable />} />
+              <Route path="/offline" element={<Offline />} />
+              <Route path="/dev" element={<Development />} />
+              <Route path="/coba" element ={<Coba />}  />
+              <Route path="/adduser" element ={<AddUser />}  />
+              <Route path="/listuser" element ={<ListUser />}  />
+              <Route path="/verify/:token" element ={<Verify />}  />
+              <Route path="/scanadd" element ={<ScanAdd />}  />
+              <Route path="/scanlease" element ={<ScanLease />}  />
+              <Route path="/scancheck" element ={<ScanCheck />}  />
+              <Route path="/qrgen" element ={<QRGen />}  />
             </Routes>
         </div>
       </div>

@@ -80,9 +80,13 @@ class LeaseTicket(Resource):
                     lmd.close()
                     db.close()
                     return {"message": "Lease successfully Send", "Status": "success"}, 200
-                except:
+                # except:
+                #     db.rollback()
+                #     return {"message": "Error Mail", "Status": "error"}
+                except Exception as error:
                     db.rollback()
-                    return {"message": "Error Mail", "Status": "error"}
+                    return {"message": f"Error Mail: {str(error)}", "Status": "error"}
+
             else:
                 return {"message": "You don't have access to run this command", "Status": "error"}, 403
 

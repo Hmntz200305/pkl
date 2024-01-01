@@ -6,7 +6,7 @@ import { Input, Menu, MenuList, MenuItem, MenuHandler, Button } from "@material-
 import Modal from 'react-modal';
 
 const AddAsset = () => {
-    const { token, Role, refreshAssetData, refreshStatusList, StatusOptions, refreshLocationList, LocationOptions, refreshCategoryList, CategoryOptions, setNotification, setNotificationStatus, setNotificationInfo, openSidebar, setOpenSidebar } = useAuth();
+    const { token, Role, refreshAssetData, refreshStatusList, StatusOptions, refreshLocationList, LocationOptions, refreshCategoryList, CategoryOptions, setNotification, setNotificationStatus, setNotificationInfo, openSidebar, setOpenSidebar} = useAuth();
     const [newStatus, setnewStatus] = useState("");
     const [newLocation, setnewLocation] = useState("");
     const [newCategory, setnewCategory] = useState("");
@@ -24,12 +24,12 @@ const AddAsset = () => {
     const [inputValueStatus, setInputValueStatus] = useState('');
     const [inputValueLocation, setInputValueLocation] = useState('');
     const [inputValueCategory, setInputValueCategory] = useState('');
-    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-    const isMobile = windowWidth <= 768;
-    const [isDesktopView, setIsDesktopView] = useState(window.innerWidth > 768);
     const [modalStatus, setModalStatus] = useState(false);
     const [modalLocation, setModalLocation] = useState(false);
     const [modalCategory, setModalCategory] = useState(false);
+    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+    const isMobile = windowWidth <= 768;
+    const [isDesktopView, setIsDesktopView] = useState(window.innerWidth > 768);
 
     const handleResizeMobile = () => {
         setIsDesktopView(window.innerWidth > 768);
@@ -45,18 +45,19 @@ const AddAsset = () => {
     
     useEffect(() => {
         window.addEventListener('resize', handleResizeMobile);
-  
+
         return () => {
         window.removeEventListener('resize', handleResizeMobile);
         };
     }, []);
-  
+
     useEffect(() => {
       window.addEventListener('resize', handleResizeApp);
       return () => {
         window.removeEventListener('resize', handleResizeApp);
       };
     }, []);
+
 
     const openModalStatus = () => {
       setModalStatus(true);
@@ -261,11 +262,27 @@ const AddAsset = () => {
       }
     };
 
+    const getRandomColor = () => {
+        const letters = '0123456789ABCDEF';
+        let color = '#';
+        for (let i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    }
+
+    useEffect(() => {
+        const dashboardIcons = document.querySelectorAll('.dashboard-icon');
+        dashboardIcons.forEach((icon) => {
+            icon.style.backgroundColor = getRandomColor();
+        });
+    }, []);
+
     return (
         <>
             <div className='p-2'>
-                <div className='bg-white mb-5 rounded-2xl p-4 shadow'>
-                    <h2 className=''>Welcome, Add an Asset page :)</h2>
+                <div className='dashboard-icon mb-5 rounded-2xl p-4 shadow'>
+                    <h2 className='text-white'>Welcome, Add an Asset page :)</h2>
                 </div>
             </div>
 

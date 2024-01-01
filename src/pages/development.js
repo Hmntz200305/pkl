@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { QrReader } from 'react-qr-reader';
+import {QrReader} from 'react-qr-reader'
 import DataTable from 'react-data-table-component';
 import 'react-data-table-component-extensions/dist/index.css';
 
@@ -95,14 +95,24 @@ const QRScanner = () => {
 
   return (
     <div>
-      <QrReader
-        delay={300}
-        onError={handleError}
-        onScan={handleScan}
-        onResult={handleResult}  // Add this line
-        style={{ width: '50%' }}
-        rearCamera
-      />
+      <div className="flex flex-col items-center justify-center relative">
+              {/* Red marker using Tailwind CSS */}
+              <div
+                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-8 h-8 border-2 border-red-500"
+              />
+              {/* QR Code reader component */}
+              <QrReader
+                delay={300}
+                onError={handleError}
+                onScan={handleScan}
+                onResult={handleResult}
+                containerStyle={{ width: '50%', height: '50%' }}
+                className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-8 h-8 border-2 border-red-500'
+                videoContainerStyle={{}}
+                rearCamera
+              />
+        </div>
+
       <div className='p-2'>
         <div className='bg-white p-2'>
           {console.log('Table Data:', tableData)}

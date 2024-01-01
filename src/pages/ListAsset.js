@@ -235,11 +235,11 @@ const ListAsset = () => {
   const [inputValueStatus, setInputValueStatus] = useState('');
   const [inputValueLocation, setInputValueLocation] = useState('');
   const [inputValueCategory, setInputValueCategory] = useState('');
+  const [modalEdit, setModalEdit] = useState(false);
+  const [modalDelete, setModalDelete] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const isMobile = windowWidth <= 768;
   const [isDesktopView, setIsDesktopView] = useState(window.innerWidth > 768);
-  const [modalEdit, setModalEdit] = useState(false);
-  const [modalDelete, setModalDelete] = useState(false);
 
   const handleResizeMobile = () => {
       setIsDesktopView(window.innerWidth > 768);
@@ -392,6 +392,22 @@ const ListAsset = () => {
     }
   };
 
+  const getRandomColor = () => {
+      const letters = '0123456789ABCDEF';
+      let color = '#';
+      for (let i = 0; i < 6; i++) {
+          color += letters[Math.floor(Math.random() * 16)];
+      }
+      return color;
+  }
+
+  useEffect(() => {
+      const dashboardIcons = document.querySelectorAll('.dashboard-icon');
+      dashboardIcons.forEach((icon) => {
+          icon.style.backgroundColor = getRandomColor();
+      });
+  }, []);
+
   const [activeTab, setActiveTab] = React.useState("export");
     const data = [
     {
@@ -480,7 +496,7 @@ const ListAsset = () => {
   return (
     <>
       <div className='p-2'>
-        <div className='bg-black mb-5 rounded-2xl p-4 shadow'>
+        <div className='dashboard-icon mb-5 rounded-2xl p-4 shadow'>
           <h2 className='text-white'>Selamat datang di List of Asset page :)</h2>
         </div>
       </div>
