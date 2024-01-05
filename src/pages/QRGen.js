@@ -170,7 +170,7 @@ const QRGen = () => {
             cell: (row) => (
             <div className='flex flex-col items-center justify-center'>
                 <img src={row.QRCode} alt="QRCode" style={{ width: '50px', height: '50px' }} />
-                <button onClick={() => handleDownload(row.QRCode, row.AssetID)}>
+                <button onClick={() => handleDownload(row.QRCode, row.AssetID)} className='text-blue-300 underline'>
                     Download
                 </button>
             </div>
@@ -224,29 +224,14 @@ const QRGen = () => {
         },
     ]
 
-    const getRandomColor = () => {
-        const letters = '0123456789ABCDEF';
-        let color = '#';
-        for (let i = 0; i < 6; i++) {
-            color += letters[Math.floor(Math.random() * 16)];
-        }
-        return color;
-    }
-  
-    useEffect(() => {
-        const dashboardIcons = document.querySelectorAll('.dashboard-icon');
-        dashboardIcons.forEach((icon) => {
-            icon.style.backgroundColor = getRandomColor();
-        });
-    }, []);
-
   return (
     <>
         <div className='p-2'>
-            <div className='dashboard-icon rounded-2xl p-4 shadow'>
+            <div className='bg-gray-800 rounded-2xl p-4 shadow'>
                 <h2 className='text-white'>Welcome, QR Generator Page :)</h2>
             </div>
         </div>
+
         <div className='p-2'>
             <div className='bg-white rounded-2xl shadow p-4 space-y-4'>
                 <div className='flex items-center gap-4'>
@@ -411,7 +396,7 @@ const QRGen = () => {
                     />
                 </div>
                 <div className='flex justify-end'>
-                    <button type="button" className='main-btn' id="edit-button" onClick={handleGenQR} disabled={isLoading}>{isLoading ? 'Generating...' : 'Generate'}</button>
+                    <Button type="button" className='' id="edit-button" onClick={handleGenQR} disabled={isLoading}>{isLoading ? 'Generating...' : 'Generate'}</Button>
                 </div>
                 <div className='p-2'>
                     <div className='bg-white p-2'>

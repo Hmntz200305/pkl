@@ -210,8 +210,8 @@ class TicketApprove(Resource):
                                     db.commit()
                                     message = Message(f'Peminjaman Barang LMD', sender='nakatsuuchiha@gmail.com', recipients=[admin2_email])
                                     message.body = f'Ticket Number {selectedTicketId}\n' \
-                                                       f'Atas Nama {data[3]} ingin meminjam barang {assetname}\n' \
-                                                       f'Admin Pertama atas nama {usernameadmin1}({fetch_ticketingadmin}) telah menyetujui Pengajuan ini\n' \
+                                                   f'Atas Nama {data[3]} ingin meminjam barang {assetname}\n' \
+                                                   f'Admin Pertama atas nama {usernameadmin1}({fetch_ticketingadmin}) telah menyetujui Pengajuan ini\n' \
                                                         'Klick Link untuk tindak/informasi lebih lanjut: https://asset.lintasmediadanawa.com/submitted'
                                     mail.send(message)
                                 else:
@@ -233,8 +233,8 @@ class TicketApprove(Resource):
                                     db.commit()
                                     message = Message(f'Peminjaman Barang LMD (Approved)', sender='nakatsuuchiha@gmail.com', recipients=[data[4]])
                                     message.body = f'Ticket Number {selectedTicketId}\n' \
-                                                       f'Meminjam Barang {assetname}\n' \
-                                                       f'Admin Pertama atas nama {usernameadmin1} ({fetch_ticketingadmin}) dan Admin Kedua atas nama {usernameadmin2} ({fetch_ticketingadmin_2})telah menyetujui Pengajuan ini\n'
+                                                   f'Meminjam Barang {assetname}\n' \
+                                                   f'Admin Pertama atas nama {usernameadmin1} ({fetch_ticketingadmin}) dan Admin Kedua atas nama {usernameadmin2} ({fetch_ticketingadmin_2})telah menyetujui Pengajuan ini\n'
                                     mail.send(message)
                             lmd.close()
                             db.close()          

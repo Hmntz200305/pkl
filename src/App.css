@@ -2,7 +2,7 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
-.form-group {
+/* .form-group {
     flex: 1;
     padding: 0 15px;
     display: flex;
@@ -48,7 +48,7 @@
 .category-dropdown {
     border: 1px solid #ccc;
     border-radius: 5px;
-    appearance: none; /* Remove default appearance */
+    appearance: none;
     -webkit-appearance: none;
     background-color: #fff;
     padding: 10px 10px;
@@ -61,14 +61,13 @@
     flex: 1;
     width: 300px;
 }
-/* CSS untuk mengatur teks di dalam dropdown menjadi ditengah */
 .category-dropdown option {
     text-align: center;
     text-align-last: center;
 }
 
 .category-dropdown::after {
-    content: '\25BC'; /* Downward arrow character */
+    content: '\25BC';
     position: absolute;
     top: 50%;
     right: 10px;
@@ -90,9 +89,9 @@
 }
 
 .notification {
-    transform: translateX(100%); /* Initial position for slide-out */
-    animation-duration: 1s; /* Menyesuaikan durasi animasi dengan JavaScript */
-    animation-fill-mode: forwards; /* Tetapkan elemen dalam posisi akhir animasi */
+    transform: translateX(100%);
+    animation-duration: 1s;
+    animation-fill-mode: forwards;
   }
   
   .slide-in {
@@ -123,4 +122,4 @@
       transform: translateX(100%);
       opacity: 0;
     }
-  }
+  } */

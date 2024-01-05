@@ -124,7 +124,7 @@ const Login = () => {
             setFUsername('');
             setFEmail('');
             setFPassword('');
-            setShowModalForgot(false);
+            setOpenModal(false);
           } else {
             const data = await response.json();
             setNotification(data.message);

@@ -75,9 +75,9 @@ const ListAsset = () => {
       <div className='flex flex-col p-2 gap-1'>
         <p className='mb-4'>Silahkan pilih ingin mengexport dengan apa </p>
         <div className='flex space-x-[1px]'>
-          <button className='main-btn cursor-default'>
+          <Button className=' cursor-default'>
             <FontAwesomeIcon icon={faFileCsv} size='xl' />
-          </button>
+          </Button>
           <div className='flex flex-grow items-center border rounded border-gray-800'>
             <button 
               className='flex-grow rounded py-[8px] text-black hover:bg-gray-800 hover:text-white'
@@ -103,9 +103,9 @@ const ListAsset = () => {
           </div>
         </div>
         <div className='flex space-x-[1px]'>
-          <button className='main-btn cursor-default'>
+          <Button className=' cursor-default'>
             <FontAwesomeIcon icon={faFilePdf} size='xl' />
-          </button>
+          </Button>
           <div className='flex flex-grow items-center border rounded border-gray-800'>
             <button 
               className='flex-grow rounded py-[8px] text-black hover:bg-gray-800 hover:text-white' 
@@ -219,7 +219,7 @@ const ListAsset = () => {
                 <input className='hidden' {...getInputProps()} id="dropzone-file" type="file" accept=".csv, .xlsx" onChange={handleFileChange} />
               </label>
             </div>
-            <button className='main-btn' onClick={handleFileUpload}>Upload</button>
+            <Button className='' onClick={handleFileUpload}>Upload</Button>
           </div>
       </div>
     )
@@ -392,22 +392,6 @@ const ListAsset = () => {
     }
   };
 
-  const getRandomColor = () => {
-      const letters = '0123456789ABCDEF';
-      let color = '#';
-      for (let i = 0; i < 6; i++) {
-          color += letters[Math.floor(Math.random() * 16)];
-      }
-      return color;
-  }
-
-  useEffect(() => {
-      const dashboardIcons = document.querySelectorAll('.dashboard-icon');
-      dashboardIcons.forEach((icon) => {
-          icon.style.backgroundColor = getRandomColor();
-      });
-  }, []);
-
   const [activeTab, setActiveTab] = React.useState("export");
     const data = [
     {
@@ -496,7 +480,7 @@ const ListAsset = () => {
   return (
     <>
       <div className='p-2'>
-        <div className='dashboard-icon mb-5 rounded-2xl p-4 shadow'>
+        <div className='bg-gray-800 mb-5 rounded-2xl p-4 shadow'>
           <h2 className='text-white'>Selamat datang di List of Asset page :)</h2>
         </div>
       </div>
@@ -713,8 +697,8 @@ const ListAsset = () => {
                 <Input type='file' accept='image/*' variant="outline" label="Input Asset Photo" name='photo' onChange={handleImageChange} />
               </div>
               <div className='flex gap-1 justify-end'>
-                <button type="button" className='main-btn' id="edit-button" onClick={closeModalEdit}>Cancel</button>
-                <button type="button" className='main-btn' id="edit-button" onClick={() => editAsset(token)}>Edit Asset</button>
+                <button type="button" className='' id="edit-button" onClick={closeModalEdit}>Cancel</button>
+                <button type="button" className='' id="edit-button" onClick={() => editAsset(token)}>Edit Asset</button>
               </div>
             </div>
           </div>
@@ -897,8 +881,8 @@ const ListAsset = () => {
                 <Input type='file' accept='image/*' variant="outline" label="Input Asset Photo" name='photo' onChange={handleImageChange} />
               </div>
               <div className='flex gap-1 justify-end'>
-                <button type="button" className='main-btn' id="edit-button" onClick={closeModalEdit}>Cancel</button>
-                <button type="button" className='main-btn' id="edit-button" onClick={() => editAsset(token)}>Edit Asset</button>
+                <Button type="button" className='' id="edit-button" onClick={closeModalEdit}>Cancel</Button>
+                <Button type="button" className='' id="edit-button" onClick={() => editAsset(token)}>Edit Asset</Button>
               </div>
             </div>
           </div>
@@ -921,12 +905,12 @@ const ListAsset = () => {
                 <p>Apakah anda yakin ingin menghapus Asset ini?</p>
               </div>
               <div className="flex space-x-4 mt-5">
-                <button className="main-btn" onClick={closeModalDelete}>
+                <Button className="" onClick={closeModalDelete}>
                   Cancel
-                </button>
-                <button className="main-btn" onClick={() => deleteAsset(selectedAssetId)}>
+                </Button>
+                <Button className="" onClick={() => deleteAsset(selectedAssetId)}>
                   Delete
-                </button>
+                </Button>
               </div>
             </div>
           </div>
@@ -949,12 +933,12 @@ const ListAsset = () => {
                 <p>Apakah anda yakin ingin menghapus Asset ini?</p>
               </div>
               <div className="flex space-x-4 mt-5">
-                <button className="main-btn" onClick={closeModalDelete}>
+                <Button className="" onClick={closeModalDelete}>
                   Cancel
-                </button>
-                <button className="main-btn" onClick={() => deleteAsset(selectedAssetId)}>
+                </Button>
+                <Button className="" onClick={() => deleteAsset(selectedAssetId)}>
                   Delete
-                </button>
+                </Button>
               </div>
             </div>
           </div>

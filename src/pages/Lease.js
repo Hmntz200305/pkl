@@ -231,26 +231,10 @@ const Lease = () => {
             },
     ]
 
-    const getRandomColor = () => {
-        const letters = '0123456789ABCDEF';
-        let color = '#';
-        for (let i = 0; i < 6; i++) {
-            color += letters[Math.floor(Math.random() * 16)];
-        }
-        return color;
-    }
-  
-    useEffect(() => {
-        const dashboardIcons = document.querySelectorAll('.dashboard-icon');
-        dashboardIcons.forEach((icon) => {
-            icon.style.backgroundColor = getRandomColor();
-        });
-    }, []);
-
     return (
         <>
             <div className='p-2'>
-                <div className='dashboard-icon mb-5 rounded-2xl p-4 shadow'>
+                <div className='bg-gray-800 mb-5 rounded-2xl p-4 shadow'>
                     <h2 className='text-white'>Selamat datang di Lease page :)</h2>
                 </div>
             </div>
@@ -277,7 +261,7 @@ const Lease = () => {
                     />
                     </DataTableExtensions>
                     <div className='flex justify-end mt-5'>
-                        <button className='main-btn' id='lanjut' onClick={showFormulirHandler} disabled={selectedAssets.length === 0}>Check Out</button>
+                        <Button className='' id='lanjut' onClick={showFormulirHandler} disabled={selectedAssets.length === 0}>Check Out</Button>
                     </div>
                 </div>
             </div>
@@ -288,7 +272,7 @@ const Lease = () => {
                 <div className='bg-white p-5 rounded-xl'>
                     <div className='flex items-center justify-between'>
                         <h2 className=''>Berikut ini adalah Asset yang anda pinjam</h2>
-                        <button className='main-btn' onClick={showTableHandler}>Back</button>
+                        <Button className='' onClick={showTableHandler}>Back</Button>
                     </div>
                     <DataTable className='bg-[#efefef] mt-5 border-black'
                         columns={columns}
@@ -464,14 +448,14 @@ const Lease = () => {
                             </div>
                         </div>
                         <div className='flex justify-end mt-4'>
-                            <button
-                                className='main-btn'
+                            <Button
+                                className=''
                                 type='submit'
                                 onClick={() => handleLeaseAsset(token)}
                                 disabled={isLoading}
                             >
                                 {isLoading ? 'Submitting...' : 'Submit'}
-                            </button>
+                            </Button>
                         </div>
                     </div>
 

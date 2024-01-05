@@ -3,6 +3,7 @@ import DataTable from 'react-data-table-component';
 import DataTableExtensions from 'react-data-table-component-extensions';
 import 'react-data-table-component-extensions/dist/index.css';
 import { faCircleInfo, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { Button } from '@material-tailwind/react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Modal from 'react-modal';
 import { useAuth } from '../AuthContext';
@@ -307,27 +308,11 @@ const MyReport = () => {
                 ),
             },
     ]
-
-    const getRandomColor = () => {
-        const letters = '0123456789ABCDEF';
-        let color = '#';
-        for (let i = 0; i < 6; i++) {
-            color += letters[Math.floor(Math.random() * 16)];
-        }
-        return color;
-    }
-  
-    useEffect(() => {
-        const dashboardIcons = document.querySelectorAll('.dashboard-icon');
-        dashboardIcons.forEach((icon) => {
-            icon.style.backgroundColor = getRandomColor();
-        });
-    }, []);
     
     return (
         <>
             <div className='p-2'>
-                <div className='dashboard-icon mb-5 rounded-2xl p-4 shadow'>
+                <div className='bg-gray-800 mb-5 rounded-2xl p-4 shadow'>
                     <h2 className='text-white'>Selamat datang di My Report page :)</h2>
                 </div>
             </div>
@@ -341,19 +326,19 @@ const MyReport = () => {
                     </div>
                     
                     <div className="flex space-x-4 mt-5">
-                    <button 
-                    className="main-btn hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded" 
+                    <Button 
+                    className=" hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded" 
                     onClick={showDeleteHandler}
                     >
                         Cancel
-                    </button>
-                    <button 
-                    className="main-btn hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded"
+                    </Button>
+                    <Button 
+                    className=" hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded"
                     onClick={() => handleDelete(token)}
                     disabled={isLoading}
                     >
                         {isLoading ? 'Proses...' : 'Delete'}
-                    </button>
+                    </Button>
                     </div>
                 </div>
             </div>
@@ -392,9 +377,9 @@ const MyReport = () => {
                                 data={selectedAssetDetails}
                                 highlightOnHover
                             />
-                        <button onClick={closeModalAssetHandle} className="main-btn mt-4">
+                        <Button onClick={closeModalAssetHandle} className=" mt-4">
                             Close
-                        </button>
+                        </Button>
                     </div>
                 </Modal>
             )}
@@ -414,9 +399,9 @@ const MyReport = () => {
                                 data={selectedAssetDetails}
                                 highlightOnHover
                             />
-                        <button onClick={closeModalAssetHandle} className="main-btn mt-4">
+                        <Button onClick={closeModalAssetHandle} className=" mt-4">
                             Close
-                        </button>
+                        </Button>
                     </div>
                 </Modal>
             )}

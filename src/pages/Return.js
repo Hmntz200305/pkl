@@ -4,7 +4,7 @@ import 'react-data-table-component-extensions/dist/index.css';
 import { faCircleInfo } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAuth } from '../AuthContext';
-import foto from '../resources/img/aset2.jpg';
+import { Button } from '@material-tailwind/react'
 import Modal from 'react-modal';
 Modal.setAppElement('#root');
 
@@ -248,26 +248,10 @@ const Return = () => {
             },
     ];
 
-    const getRandomColor = () => {
-        const letters = '0123456789ABCDEF';
-        let color = '#';
-        for (let i = 0; i < 6; i++) {
-            color += letters[Math.floor(Math.random() * 16)];
-        }
-        return color;
-    }
-  
-    useEffect(() => {
-        const dashboardIcons = document.querySelectorAll('.dashboard-icon');
-        dashboardIcons.forEach((icon) => {
-            icon.style.backgroundColor = getRandomColor();
-        });
-    }, []);
-
     return (
         <>
             <div className='p-2'>
-                <div className='dashboard-icon mb-5 rounded-2xl p-4 shadow'>
+                <div className='bg-gray-800 mb-5 rounded-2xl p-4 shadow'>
                     <h2 className='text-white'>Selamat datang di Return page :)</h2>
                 </div>
             </div>
@@ -298,9 +282,9 @@ const Return = () => {
                                 data={selectedAssetDetails}
                                 highlightOnHover
                             />
-                        <button onClick={closeModalAssetHandle} className="main-btn mt-4">
+                        <Button onClick={closeModalAssetHandle} className=" mt-4">
                             Close
-                        </button>
+                        </Button>
                     </div>
                 </Modal>
             )}
@@ -320,9 +304,9 @@ const Return = () => {
                                 data={selectedAssetDetails}
                                 highlightOnHover
                             />
-                        <button onClick={closeModalAssetHandle} className="main-btn mt-4">
+                        <Button onClick={closeModalAssetHandle} className=" mt-4">
                             Close
-                        </button>
+                        </Button>
                     </div>
                 </Modal>
             )}
@@ -339,14 +323,14 @@ const Return = () => {
                 />
             </div>
             <div className='flex justify-end p-2'>
-                <button
-                    className='main-btn'
+                <Button
+                    className=''
                     type='submit'
                     onClick={() => handleReturnAsset(token, selectedLoanID)}
                     disabled={isLoading} 
                 >
                     {isLoading ? 'Returning...' : 'Return'}
-                </button>
+                </Button>
             </div>
         </>
     )

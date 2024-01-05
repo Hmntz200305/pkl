@@ -10,7 +10,7 @@ import { MaterialReactTable, createMRTColumnHelper, } from 'material-react-table
 import { mkConfig, generateCsv, download } from 'export-to-csv';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { Tabs, TabsHeader, TabsBody, Tab, TabPanel, } from "@material-tailwind/react";
+import { Tabs, TabsHeader, TabsBody, Tab, TabPanel, Button } from "@material-tailwind/react";
 Modal.setAppElement('#root');
 
 const History = () => {
@@ -76,9 +76,9 @@ const History = () => {
             <div className='p-0'>
                 <p className='mb-4'>Silahkan pilih ingin mengexport dengan apa </p>
                 <div className='flex space-x-[1px]'>
-                    <button className='main-btn cursor-default'>
+                    <Button className=' cursor-default'>
                         <FontAwesomeIcon icon={faFileCsv} size='xl' />
-                    </button>
+                    </Button>
                     <div className='flex flex-grow items-center border rounded border-gray-800'>
                         <button 
                             className='flex-grow rounded py-[8px] text-black hover:bg-gray-800 hover:text-white'
@@ -104,9 +104,9 @@ const History = () => {
                     </div>
                 </div>
                 <div className='flex space-x-[1px]'>
-                    <button className='main-btn cursor-default'>
+                    <Button className=' cursor-default'>
                         <FontAwesomeIcon icon={faFilePdf} size='xl' />
-                    </button>
+                    </Button>
                     <div className='flex flex-grow items-center border rounded border-gray-800'>
                         <button 
                             className='flex-grow rounded py-[8px] text-black hover:bg-gray-800 hover:text-white' 
@@ -207,9 +207,9 @@ const History = () => {
             <div className='p-0'>
                 <p className='mb-4'>Silahkan pilih ingin mengexport dengan apa </p>
                 <div className='flex space-x-[1px]'>
-                    <button className='main-btn cursor-default'>
+                    <Button className=' cursor-default'>
                         <FontAwesomeIcon icon={faFileCsv} size='xl' />
-                    </button>
+                    </Button>
                     <div className='flex flex-grow items-center border rounded border-gray-800'>
                         <button 
                             className='flex-grow rounded py-[8px] text-black hover:bg-gray-800 hover:text-white'
@@ -235,9 +235,9 @@ const History = () => {
                     </div>
                 </div>
                 <div className='flex space-x-[1px]'>
-                    <button className='main-btn cursor-default'>
+                    <Button className=' cursor-default'>
                         <FontAwesomeIcon icon={faFilePdf} size='xl' />
-                    </button>
+                    </Button>
                     <div className='flex flex-grow items-center border rounded border-gray-800'>
                         <button 
                             className='flex-grow rounded py-[8px] text-black hover:bg-gray-800 hover:text-white' 
@@ -519,26 +519,10 @@ const History = () => {
             },
     ]
 
-    const getRandomColor = () => {
-        const letters = '0123456789ABCDEF';
-        let color = '#';
-        for (let i = 0; i < 6; i++) {
-            color += letters[Math.floor(Math.random() * 16)];
-        }
-        return color;
-    }
-  
-    useEffect(() => {
-        const dashboardIcons = document.querySelectorAll('.dashboard-icon');
-        dashboardIcons.forEach((icon) => {
-            icon.style.backgroundColor = getRandomColor();
-        });
-    }, []);
-
     return (
         <>
             <div className='p-2'>
-                <div className='dashboard-icon rounded-2xl p-4 shadow'>
+                <div className='bg-gray-800 rounded-2xl p-4 shadow'>
                     <h2 className='text-white'>Selamat datang di History page :)</h2>
                 </div>
             </div>
@@ -594,9 +578,9 @@ const History = () => {
                                 data={selectedAssetDetails}
                                 highlightOnHover
                             />
-                        <button onClick={closeMoreDetailHandler} className="main-btn mt-4">
+                        <Button onClick={closeMoreDetailHandler} className=" mt-4">
                             Close
-                        </button>
+                        </Button>
                     </div>
                 </Modal>
             )}
@@ -616,9 +600,9 @@ const History = () => {
                                 data={selectedAssetDetails}
                                 highlightOnHover
                             />
-                        <button onClick={closeMoreDetailHandler} className="main-btn mt-4">
+                        <Button onClick={closeMoreDetailHandler} className=" mt-4">
                             Close
-                        </button>
+                        </Button>
                     </div>
                 </Modal>
             )}

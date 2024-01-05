@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import { Button } from '@material-tailwind/react'
 
 const Verify = () => {
   const [token, setToken] = useState('');
@@ -46,7 +47,7 @@ const Verify = () => {
   return (
     <div>
       <h2>Verification Page</h2>
-      <button className='main-btn' onClick={handleVerify}>Verify</button>
+      <Button className='main-btn' onClick={handleVerify}>Verify</Button>
     </div>
   );
 };

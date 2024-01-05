@@ -10,7 +10,6 @@ import profileAD from './resources/profile/admin.svg'
 import profileUS from './resources/profile/user.svg'
 import profileGU from './resources/profile/guest.svg'
 import Dashboard from './pages/Dashboard';
-import Chat from './pages/Chat';
 import ListAsset from './pages/ListAsset';
 import AddAsset from './pages/AddAsset';
 import Return from './pages/Return';
@@ -18,18 +17,12 @@ import Lease from './pages/Lease';
 import Submitted from './pages/Submitted';
 import History from './pages/History';
 import AddUser from './pages/AddUser';
-import ManageUser from './pages/ManageUser';
 import ListUser from './pages/ListUser';
 import Login from './Login';
 import Notfound from './pages/Notfound';
 import MyReport from './pages/MyReport';
-import QrAdd from './pages/QrAdd';
 import QRGen from './pages/QRGen';
-import Qrdesc from './pages/Qrdesc';
-import Qrtable from './pages/Qrtable';
 import Offline from './pages/Offline';
-import Development from './pages/development';
-import Coba from './pages/Coba';
 import Verify from './pages/Verify';
 import ScanAdd from './pages/ScanAdd';
 import ScanLease from './pages/ScanLease';
@@ -47,6 +40,8 @@ const Home = () =>  {
   const [isDesktopView, setIsDesktopView] = useState(window.innerWidth > 768);
   const [rotateButton, setRotateButton] = useState(false);
   const [popoverProfile, setPopoverProfile] = useState(false);
+  const [activeNotification, setActiveNotification] = useState(null);
+  const [iconComponent, setIconComponent] = useState(null);
  
   const popoverProfileHandler = {
     onMouseEnter: () => setPopoverProfile(true),
@@ -95,52 +90,57 @@ const Home = () =>  {
 
 
   useEffect(() => {
+    const clearNotification = () => {
+      setNotificationStatus(false);
+      setNotification('');
+      setNotificationInfo('');
+      setActiveNotification(null);
+      setIconComponent(null); // Clear iconComponent content
+    };
+
+
     if (NotificationStatus) {
+      let toastConfig = {};
+      let iconComponent = null;
+
       if (NotificationInfo === 'success') {
-        toast.success(
-          <p className='ml-3'>
-            {Notification}
-          </p>,
-        {
-          icon: (
-            <div className='bg-green-500 p-2 rounded-xl flex items-center w-8 h-8 '>
-              <FontAwesomeIcon icon={faThumbsUp} />
-            </div>
-          )
-        });
+        iconComponent = (
+          <div className='bg-green-500 p-2 rounded-xl flex items-center w-8 h-8 '>
+            <FontAwesomeIcon icon={faThumbsUp} />
+          </div>
+        );
       } else if (NotificationInfo === 'error') {
-        toast.error(
-          <p className='ml-3'>
-            {Notification}
-          </p>,          
-        {
-          icon: (
-            <div className='bg-red-500 p-2 rounded-xl flex items-center w-8 h-8 '>
-              <FontAwesomeIcon icon={faThumbsDown} />
-            </div>
-          )
-        });
+        iconComponent = (
+          <div className='bg-red-500 p-2 rounded-xl flex items-center w-8 h-8 '>
+            <FontAwesomeIcon icon={faThumbsDown} />
+          </div>
+        );
       } else if (NotificationInfo === 'warning') {
-        toast.warning(
-          <p className='ml-3'>
-            {Notification}
-          </p>,
-        {
-          icon: (
-            <div className='bg-yellow-700 p-2 rounded-xl flex items-center w-8 h-8'>
-              <FontAwesomeIcon icon={faTriangleExclamation} />
-            </div>
-          )
-        });
-      } else {
+        iconComponent = (
+          <div className='bg-yellow-700 p-2 rounded-xl flex items-center w-8 h-8'>
+            <FontAwesomeIcon icon={faTriangleExclamation} />
+          </div>
+        );
       }
-    } else {
+
+      if (activeNotification !== NotificationInfo) {
+        toastConfig = {
+          icon: iconComponent,
+          // other toast configurations
+        };
+
+        setActiveNotification(NotificationInfo);
+        toast[NotificationInfo](<p className='ml-3'>{Notification}</p>, toastConfig);
+
+        setTimeout(clearNotification, 3000);
+      }
     }
+
 
     setNotificationStatus(false);
     setNotification('');
     setNotificationInfo('');
-  }, [NotificationStatus, NotificationInfo, Notification]);
+  }, [NotificationStatus, NotificationInfo, Notification, activeNotification]);
 
   const getProfileImage = (Role) => {
     if (Role === 2) {
@@ -336,20 +336,6 @@ const Home = () =>  {
                   </Typography>
                 </ListItem>
               </Link>
-              {/* CHAT */}
-              {/* <Link to='/chat'>
-                <ListItem className='px-4 text-white hover:bg-[#323b49] hover:text-white focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
-                  <ListItemPrefix className='mr-3 w-6 h-6'>
-                    <FontAwesomeIcon icon={faComments} />
-                  </ListItemPrefix>
-                  <Typography>
-                    Chat
-                  </Typography>
-                  <ListItemSuffix>
-                    <Chip value="14" size="sm" variant="white" color="blue-gray" className="rounded-full" />
-                  </ListItemSuffix>
-                </ListItem>
-              </Link> */}
               {/* ASSET */}
               <Accordion
                 open={openSubmenu === 1}
@@ -566,19 +552,6 @@ const Home = () =>  {
                   </List>
                 </AccordionBody>
               </Accordion>
-              {/* MANAGE USER */}
-              {/* {Role === 2 && (
-                <Link to='manageuser'>
-                  <ListItem className='px-4 text-white hover:bg-[#323b49] hover:text-white focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
-                    <ListItemPrefix className='mr-3 w-6 h-6'>
-                      <FontAwesomeIcon icon={faUserGear}/>
-                    </ListItemPrefix>
-                    <Typography>
-                      Manage User
-                    </Typography>
-                  </ListItem>
-                </Link>
-              )} */}
               {loggedIn && (
                 <Link to='/Login'>
                   <ListItem onClick={logout} className=' py-2 mt-4 flex justify-center items-center text-sm text-white bg-gray-600 hover:text-white hover:bg-[#323b49] focus:text-white focus:bg-gray-600 active:bg-gray-600 active:text-white'>
@@ -631,20 +604,6 @@ const Home = () =>  {
                   </Typography>
                 </ListItem>
               </Link>
-              {/* CHAT */}
-              {/* <Link to='/chat'>
-                <ListItem className='px-4 text-white hover:bg-[#323b49] hover:text-white focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
-                  <ListItemPrefix className='mr-3 w-6 h-6'>
-                    <FontAwesomeIcon icon={faComments} />
-                  </ListItemPrefix>
-                  <Typography>
-                    Chat
-                  </Typography>
-                  <ListItemSuffix>
-                    <Chip value="14" size="sm" variant="white" color="blue-gray" className="rounded-full" />
-                  </ListItemSuffix>
-                </ListItem>
-              </Link> */}
               {/* ASSET */}
               <Accordion
                 open={openSubmenu === 1}
@@ -748,7 +707,7 @@ const Home = () =>  {
                 </ListItem>
                 <AccordionBody className="p-0 bg-gray-600">
                   <List className="p-0 gap-0">
-                    {Role === 2 || Role === 1 ? (
+                    {Role === 2 ? (
                       <Link to='/scanadd'>
                         <ListItem className='px-4 text-white hover:bg-[#374151] hover:text-white hover:rounded-none focus:rounded-none focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
                           <ListItemPrefix className='mr-3 w-6 h-6'>
@@ -861,19 +820,6 @@ const Home = () =>  {
                   </List>
                 </AccordionBody>
               </Accordion>
-              {/* MANAGE USER */}
-              {/* {Role === 2 && (
-                <Link to='manageuser'>
-                  <ListItem className='px-4 text-white hover:bg-[#323b49] hover:text-white focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
-                    <ListItemPrefix className='mr-3 w-6 h-6'>
-                      <FontAwesomeIcon icon={faUserGear}/>
-                    </ListItemPrefix>
-                    <Typography>
-                      Manage User
-                    </Typography>
-                  </ListItem>
-                </Link>
-              )} */}
               {loggedIn && (
                 <Link to='/Login'>
                   <ListItem onClick={logout} className=' py-2 mt-4 flex justify-center items-center text-sm text-white bg-gray-600 hover:text-white hover:bg-[#323b49] focus:text-white focus:bg-gray-600 active:bg-gray-600 active:text-white'>
@@ -900,8 +846,10 @@ const Home = () =>  {
             ) : (
               <Route path="/" element={<Login />} />
             )}
-              <Route path="/chat" element={<Chat />} />
-              <Route path="/listasset" element={<ListAsset />} />
+              <Route 
+                path="/listasset" 
+                element={<ListAsset />} 
+              />
               <Route 
                 path="/addasset" 
                 element={Role === 2 || Role === 1 ? <AddAsset /> : <Dashboard />}
@@ -918,29 +866,50 @@ const Home = () =>  {
               <Route 
                 path="/history" 
                 element={Role === 2 || Role === 1 ? <History /> : <Dashboard />} />
-              <Route 
-                path="/manageuser" 
-                element={Role === 2 ? <ManageUser /> : <Dashboard />}
-              />
               <Route
                 path="/login"
                 element={loggedIn ? <Navigate to="/" /> : <Login />}
               />  
-              <Route path="/myreport" element={<MyReport />} />
-              <Route path="*" element={<Notfound />} />
-              <Route path="/qradd" element={<QrAdd />} />
-              <Route path="/qrdesc" element={<Qrdesc />} />
-              <Route path="/qrtable" element={<Qrtable />} />
-              <Route path="/offline" element={<Offline />} />
-              <Route path="/dev" element={<Development />} />
-              <Route path="/coba" element ={<Coba />}  />
-              <Route path="/adduser" element ={<AddUser />}  />
-              <Route path="/listuser" element ={<ListUser />}  />
-              <Route path="/verify/:token" element ={<Verify />}  />
-              <Route path="/scanadd" element ={<ScanAdd />}  />
-              <Route path="/scanlease" element ={<ScanLease />}  />
-              <Route path="/scancheck" element ={<ScanCheck />}  />
-              <Route path="/qrgen" element ={<QRGen />}  />
+              <Route 
+                path="/myreport" 
+                element={<MyReport />} 
+              />
+              <Route 
+                path="*" 
+                element={<Notfound />} 
+              />
+              <Route 
+                path="/offline" 
+                element={<Offline />} 
+              />
+              <Route 
+                path="/adduser" 
+                element={Role === 2 ? <AddUser /> : <Dashboard />}
+              />
+              <Route 
+                path="/listuser" 
+                element={Role === 2 || Role === 1 ? <ListUser /> : <Dashboard />} 
+              />
+              <Route 
+                path="/verify/:token" 
+                element ={<Verify />}  
+              />
+              <Route 
+                path="/scanadd" 
+                element={Role === 2 ? <ScanAdd /> : <Dashboard />}
+              />
+              <Route 
+                path="/scanlease" 
+                element ={<ScanLease />}  
+              />
+              <Route 
+                path="/scancheck" 
+                element ={<ScanCheck />}  
+              />
+              <Route 
+                path="/qrgen" 
+                element={Role === 2 ? <QRGen /> : <Dashboard />}
+              />
             </Routes>
         </div>
       </div>

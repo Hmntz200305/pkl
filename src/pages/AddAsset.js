@@ -262,26 +262,10 @@ const AddAsset = () => {
       }
     };
 
-    const getRandomColor = () => {
-        const letters = '0123456789ABCDEF';
-        let color = '#';
-        for (let i = 0; i < 6; i++) {
-            color += letters[Math.floor(Math.random() * 16)];
-        }
-        return color;
-    }
-
-    useEffect(() => {
-        const dashboardIcons = document.querySelectorAll('.dashboard-icon');
-        dashboardIcons.forEach((icon) => {
-            icon.style.backgroundColor = getRandomColor();
-        });
-    }, []);
-
     return (
         <>
             <div className='p-2'>
-                <div className='dashboard-icon mb-5 rounded-2xl p-4 shadow'>
+                <div className='bg-gray-800 mb-5 rounded-2xl p-4 shadow'>
                     <h2 className='text-white'>Welcome, Add an Asset page :)</h2>
                 </div>
             </div>
@@ -312,8 +296,8 @@ const AddAsset = () => {
                           />
                         </div>
                         <div className="flex justify-center space-x-4 mt-5 mb-2">
-                            <button className="main-btn" onClick={closeModalStatus}>Cancel</button>
-                            <button className="main-btn" onClick={() => handleNewStatus(token)}>Tambah</button>
+                            <Button className="" onClick={closeModalStatus}>Cancel</Button>
+                            <Button className="" onClick={() => handleNewStatus(token)}>Tambah</Button>
                         </div>
                     </div>
                 </div>
@@ -345,8 +329,8 @@ const AddAsset = () => {
                           />
                         </div>
                         <div className="flex justify-center space-x-4 mt-5 mb-2">
-                            <button className="main-btn" onClick={closeModalStatus}>Cancel</button>
-                            <button className="main-btn" onClick={() => handleNewStatus(token)}>Tambah</button>
+                            <Button className="" onClick={closeModalStatus}>Cancel</Button>
+                            <Button className="" onClick={() => handleNewStatus(token)}>Tambah</Button>
                         </div>
                     </div>
                 </div>
@@ -379,8 +363,8 @@ const AddAsset = () => {
                             />
                         </div>
                         <div className="flex justify-center space-x-4 mt-5 mb-2">
-                            <button className="main-btn" onClick={closeModalLocation}>Cancel</button>
-                            <button className="main-btn" onClick={() => handleNewLocation(token)}>Tambah</button>
+                            <button className="" onClick={closeModalLocation}>Cancel</button>
+                            <button className="" onClick={() => handleNewLocation(token)}>Tambah</button>
                         </div>
                     </div>
                 </div>
@@ -412,8 +396,8 @@ const AddAsset = () => {
                             />
                         </div>
                         <div className="flex justify-center space-x-4 mt-5 mb-2">
-                            <button className="main-btn" onClick={closeModalLocation}>Cancel</button>
-                            <button className="main-btn" onClick={() => handleNewLocation(token)}>Tambah</button>
+                            <Button className="" onClick={closeModalLocation}>Cancel</Button>
+                            <Button className="" onClick={() => handleNewLocation(token)}>Tambah</Button>
                         </div>
                     </div>
                 </div>
@@ -446,8 +430,8 @@ const AddAsset = () => {
                             />
                         </div>
                         <div className="flex justify-center space-x-4 mt-5 mb-2">
-                            <button className="main-btn" onClick={closeModalCategory}>Cancel</button>
-                            <button className="main-btn" onClick={() => handleNewCategory(token)}>Tambah</button>
+                            <Button className="" onClick={closeModalCategory}>Cancel</Button>
+                            <Button className="" onClick={() => handleNewCategory(token)}>Tambah</Button>
                         </div>
                     </div>
                 </div>
@@ -479,8 +463,8 @@ const AddAsset = () => {
                             />
                         </div>
                         <div className="flex justify-center space-x-4 mt-5 mb-2">
-                            <button className="main-btn" onClick={closeModalCategory}>Cancel</button>
-                            <button className="main-btn" onClick={() => handleNewCategory(token)}>Tambah</button>
+                            <Button className="" onClick={closeModalCategory}>Cancel</Button>
+                            <Button className="" onClick={() => handleNewCategory(token)}>Tambah</Button>
                         </div>
                     </div>
                 </div>
@@ -688,7 +672,7 @@ const AddAsset = () => {
                   <Input type='file' accept='image/*' variant="outline" label="Input Asset Photo" name='photo' onChange={handleImageChange} />
                 </div>
                 <div className='flex justify-end'>
-                  <button type="button" className='main-btn' id="edit-button" onClick={() => handleAddAsset(token)} disabled={isLoading}>{isLoading ? 'Adding...' : 'Add Asset'}</button>
+                  <Button type="button" className='' id="edit-button" onClick={() => handleAddAsset(token)} disabled={isLoading}>{isLoading ? 'Adding...' : 'Add Asset'}</Button>
                 </div>
               </div>
             </div>   
