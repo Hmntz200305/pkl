@@ -10,7 +10,7 @@ import { useAuth } from '../AuthContext';
 Modal.setAppElement('#root');
 
 const MyReport = () => {
-     const { token, Role, refreshMyReport, MyReport, setNotification, setNotificationStatus, openSidebar, setOpenSidebar, } = useAuth();
+     const { token, Role, refreshMyReport, MyReport, setNotification, setNotificationStatus, NotificationInfo, setNotificationInfo, openSidebar, setOpenSidebar, } = useAuth();
      const [selectedAssetDetails, setSelectedAssetDetails] = useState([]);
      const [dataWithRemainingTime, setDataWithRemainingTime] = useState([]);
      const [selectedMyReportID, setselectedMyReportID] = useState(null);
@@ -118,6 +118,7 @@ const MyReport = () => {
             refreshMyReport();
             setNotification(data.message);
             setNotificationStatus(true);
+            setNotificationInfo(data.Status);
             setSelectedAssetDetails(null);
             setselectedMyReportID(null);
           } else {

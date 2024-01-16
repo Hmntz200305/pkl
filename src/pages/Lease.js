@@ -205,7 +205,15 @@ const Lease = () => {
               ),
             export: true
             },
-            
+            // {
+            // name: 'QRCode',
+            // cell: (row) => (
+            //     <div>
+            //       <img src={row.qrcode_path} alt="QRCode" className='rounded-lg shadow p-0.5 shadow-black' />
+            //     </div>
+            //   ),
+            // export: true
+            // },
             {
             name: 'Action',
             cell: (row) => (
@@ -401,7 +409,7 @@ const Lease = () => {
                                         </Menu>
                                         <Input 
                                             variant='outline' 
-                                            label='Select Admin 1' 
+                                            label='Select Approver 1' 
                                             className='w-full rounded-l-none'
                                             type='text'
                                             value={inputValueAdmin1}
@@ -435,7 +443,7 @@ const Lease = () => {
                                         </Menu>
                                         <Input 
                                             variant='outline' 
-                                            label='Select Admin 2' 
+                                            label='Select Approver 2' 
                                             className='w-full rounded-l-none'
                                             type='text'
                                             value={inputValueAdmin2}

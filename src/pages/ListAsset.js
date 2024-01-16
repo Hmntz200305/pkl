@@ -240,6 +240,19 @@ const ListAsset = () => {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const isMobile = windowWidth <= 768;
   const [isDesktopView, setIsDesktopView] = useState(window.innerWidth > 768);
+  const [modalQr, setModalQr] = useState(false);
+  const [QRCodePath, setQRCodePath] = useState('');
+  const [QRCodeName, setQRCodeName] = useState('');
+
+  const openModalQr = (QRPath, QRName) => {
+    setModalQr(true);
+    setQRCodePath(QRPath);
+    setQRCodeName(QRName);
+  }
+  const closeModalQr = () => {
+    setModalQr(false);
+    setQRCodePath('');
+  }
 
   const handleResizeMobile = () => {
       setIsDesktopView(window.innerWidth > 768);
@@ -406,6 +419,25 @@ const ListAsset = () => {
     },
   ];
 
+  const handleDownloadQRCode = async (url, name) => {
+    try {
+    const image = await fetch(url);
+    const imageBlob = await image.blob();
+    const imageURL = URL.createObjectURL(imageBlob);
+
+    const link = document.createElement('a');
+    link.href = imageURL;
+    link.download = name + '.png';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    URL.revokeObjectURL(imageURL);
+    } catch (error) {
+    console.error('Error downloading image:', error);
+    }
+  };
+
   const columnHelper = createMRTColumnHelper();
   const columnsNew = [
     columnHelper.accessor('no', {
@@ -454,6 +486,15 @@ const ListAsset = () => {
       enableColumnFilter: false,
       Cell: ({ row }) => (
         <img src={row.original.image_path} alt="Asset" style={{ width: '70px', height: 'auto' }} />
+      ),
+    }),
+    columnHelper.accessor('qrcode_path', {
+      header: 'QRCode',
+      size: 200,
+      enableSorting: false,
+      enableColumnFilter: false,
+      Cell: ({ row }) => (
+        <img src={row.original.qrcode_path} onClick={() => openModalQr(row.original.qrcode_path, row.original.id)} style={{ width: '70px', height: 'auto' }} />
       ),
     }),
     columnHelper.accessor('action', {
@@ -697,8 +738,8 @@ const ListAsset = () => {
                 <Input type='file' accept='image/*' variant="outline" label="Input Asset Photo" name='photo' onChange={handleImageChange} />
               </div>
               <div className='flex gap-1 justify-end'>
-                <button type="button" className='' id="edit-button" onClick={closeModalEdit}>Cancel</button>
-                <button type="button" className='' id="edit-button" onClick={() => editAsset(token)}>Edit Asset</button>
+                <Button type="button" className='' id="edit-button" onClick={closeModalEdit}>Cancel</Button>
+                <Button type="button" className='' id="edit-button" onClick={() => editAsset(token)}>Edit Asset</Button>
               </div>
             </div>
           </div>
@@ -889,6 +930,44 @@ const ListAsset = () => {
         </Modal>
       )}
       
+      {isDesktopView && (
+        <Modal 
+          isOpen={modalQr}
+          onRequestClose={closeModalQr}
+          contentLabel="Contoh Modal"
+          overlayClassName="fixed inset-0 z-50 bg-gray-500 bg-opacity-75 flex items-center justify-center border-none"
+          className={`modal-content border-none bg-transparent p-4 w-3/2 ${openSidebar ? ' pl-[315px]' : ''}`}
+          shouldCloseOnOverlayClick={false}
+        >
+          <div className='p-2 bg-[#efefef] flex justify-center items-center flex-col'>
+            <img src={QRCodePath} alt="QRCode" style={{height: '500px'}} />
+            <div className='flex mt-4 space-x-4'>
+              <Button onClick={() => handleDownloadQRCode(QRCodePath, QRCodeName)}>Download</Button>
+              <Button onClick={closeModalQr}>CLose</Button>
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {!isDesktopView && (
+        <Modal 
+          isOpen={modalQr}
+          onRequestClose={closeModalQr}
+          contentLabel="Contoh Modal"
+          overlayClassName="fixed inset-0 z-50 bg-gray-500 bg-opacity-75 flex items-center justify-center border-none"
+          className='modal-content bg-transparent p-4 w-screen border-none'
+          shouldCloseOnOverlayClick={false}
+        >
+          <div className='p-2 bg-[#efefef] flex justify-center items-center flex-col'>
+            <img src={QRCodePath} alt="QRCode" />
+            <div className='flex mt-4 space-x-4'>
+              <Button onClick={() => handleDownloadQRCode(QRCodePath, QRCodeName)}>Download</Button>
+              <Button onClick={closeModalQr}>CLose</Button>
+            </div>
+          </div>
+        </Modal>
+      )}
+
       {isDesktopView && (
         <Modal 
           isOpen={modalDelete}

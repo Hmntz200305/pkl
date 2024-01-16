@@ -133,7 +133,7 @@ class LeaseSubmited(Resource):
                 cekticket = lmd.fetchall()
 
                 for data in cekticket:
-                    idtickets, idasset, name, leasedate, returndate, location, email, note, status, deleted, idticketingadmin, idticketadmin, admin_email, admin_status, idassets, assets, assetname, assetdesc, assetbrand, assetmodel, assetstatus, assetlocation, assetcategory, assetsn, assetphoto, assetcreated = data
+                    idtickets, idasset, name, leasedate, returndate, location, email, note, status, deleted, idticketingadmin, idticketadmin, admin_email, admin_status, idassets, assets, assetname, assetdesc, assetbrand, assetmodel, assetstatus, assetlocation, assetcategory, assetsn, assetphoto, assetqrcode, assetcreated = data
                     ticket_list.append({
                         'idticket': idtickets,
                         'idasset': idasset,
